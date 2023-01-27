@@ -23,5 +23,5 @@ to discuss what you would like to change.
 
 This project is licensed under the [MIT][license] license
 
-[license]: ../blob/main/LICENSE
+[license]: ../main/LICENSE
 
