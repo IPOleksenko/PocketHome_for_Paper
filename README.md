@@ -1,4 +1,4 @@
-# Paper plugin for pocket dimensions
+# Pocket dimensions Paper plugin
 
 ## Authors
   - [IPOleksenko](https://github.com/IPOleksenko) (owner)
