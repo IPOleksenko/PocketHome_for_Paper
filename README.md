@@ -4,14 +4,29 @@
 
 Get the source from GitHub and build it with gradle:
 
-```bash
+```shell
 git clone https://github.com/IPOleksenko/PocketHome.git
 cd PocketHome/
-gradlew build
+./gradlew build
+```
+
+### Development server
+
+__After building__, you can start a development server:
+
+#### Windows:
+
+```powershell
+run/start.ps1
+```
+
+#### Linux:
+
+```shell
+run/start.sh
 ```
 
 ## Contributing
-
 Pull requests are welcome. For major changes, please open an issue first
 to discuss what you would like to change.
 
@@ -24,4 +39,3 @@ to discuss what you would like to change.
 This project is licensed under the [MIT][license] license
 
 [license]: ../main/LICENSE
-
