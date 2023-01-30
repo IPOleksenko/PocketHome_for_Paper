@@ -28,5 +28,7 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3
         with:
-          path: build/libs/*[0-9].jar
+          path: |
+            build/libs/*[0-9].jar
+            build/libs/*[0-9].sources.jar
           if-no-files-found: error

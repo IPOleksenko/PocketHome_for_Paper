@@ -23,4 +23,6 @@ jobs:
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
-          files: build/libs/*[0-9].jar
+          files: |
+            build/libs/*[0-9].jar
+            build/libs/*[0-9].sources.jar
