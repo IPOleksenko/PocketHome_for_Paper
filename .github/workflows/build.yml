@@ -1,6 +1,16 @@
   name: build
 
-  on: [ push, pull_request ]
+  on:
+    push:
+        branches:
+          - "**"
+        tags-ignore:
+          - "v*"
+    pull_request:
+        branches:
+          - "**"
+        tags-ignore:
+          - "v*"
 
   jobs:
     build:
@@ -16,8 +26,7 @@
         - name: Build artifacts
           run: ./gradlew build
         - name: Upload build artifacts
-          uses: actions/upload-artifact@v2
+          uses: actions/upload-artifact@v3
           with:
-            name: Artifacts
             path: build/libs/*[0-9].jar
             if-no-files-found: error
