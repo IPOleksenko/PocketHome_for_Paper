@@ -20,7 +20,7 @@ java {
 
 tasks {
     processResources {
-        val props = linkedMapOf("version" to version, "api_ version" to project.properties["paper_api_version"])
+        val props = linkedMapOf("version" to version, "api_version" to project.properties["paper_api_version"])
         inputs.properties(props)
         filesMatching("plugin.yml") {
             expand(props)
