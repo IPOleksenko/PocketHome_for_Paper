@@ -5,7 +5,7 @@ cd "$(dirname "$0")"/.. || exit 0
 
 cd "$(dirname "$0")" || exit 0
 
-plugin_wildcard=PocketHome-*[0-9].jar
+plugin_wildcard="PocketHome-*[0-9].jar"
 
 version=1.19.3
 build=386
@@ -16,12 +16,12 @@ if [ ! -f $file ]; then
   wget $API_URI
 fi
 
-if test -n "$(find plugins/ -maxdepth 1 -name $plugin_wildcard -print -quit)"; then
-  rm plugins/$plugin_wildcard
+if test -n "$(find plugins/ -maxdepth 1 -name "$plugin_wildcard" -print -quit)"; then
+  rm plugins/"$plugin_wildcard"
 fi
 
-if test -n "$(find ../build/libs/ -maxdepth 1 -name $plugin_wildcard -print -quit)"; then
-  cp ../build/libs/$plugin_wildcard plugins/
+if test -n "$(find ../build/libs/ -maxdepth 1 -name "$plugin_wildcard" -print -quit)"; then
+  cp ../build/libs/"$plugin_wildcard" plugins/
 fi
 
 java \
