@@ -17,11 +17,11 @@ if [ ! -f $file ]; then
 fi
 
 if test -n "$(find plugins/ -maxdepth 1 -name "$plugin_wildcard" -print -quit)"; then
-  rm plugins/"$plugin_wildcard"
+  rm plugins/$plugin_wildcard
 fi
 
 if test -n "$(find ../build/libs/ -maxdepth 1 -name "$plugin_wildcard" -print -quit)"; then
-  cp ../build/libs/"$plugin_wildcard" plugins/
+  cp ../build/libs/$plugin_wildcard plugins/
 fi
 
 java \
