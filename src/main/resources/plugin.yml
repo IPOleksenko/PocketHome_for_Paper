@@ -1,9 +1,10 @@
 main: dev.ipoleksenko.PocketHome.PocketHomePlugin
+name: PocketHome
 description: A pocket dimension plugin
 authors:
   - IPOleksenko
   - rvbsm
-api-version: 1.19
+version: ${version}
+api-version: ${api_version}
 load: POSTWORLD
 prefix: PocketHome
-
