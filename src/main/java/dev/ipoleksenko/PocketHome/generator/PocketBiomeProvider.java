@@ -8,13 +8,13 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 public class PocketBiomeProvider extends BiomeProvider {
-    @Override
-    public @NotNull Biome getBiome(@NotNull WorldInfo worldInfo, int x, int y, int z) {
-        return Biome.THE_VOID;
-    }
+	@Override
+	public @NotNull Biome getBiome(@NotNull WorldInfo worldInfo, int x, int y, int z) {
+		return Biome.THE_VOID;
+	}
 
-    @Override
-    public @NotNull List<Biome> getBiomes(@NotNull WorldInfo worldInfo) {
-        return List.of(Biome.THE_VOID);
-    }
+	@Override
+	public @NotNull List<Biome> getBiomes(@NotNull WorldInfo worldInfo) {
+		return List.of(Biome.THE_VOID);
+	}
 }
