@@ -1,3 +1,5 @@
+<img src="assets/logo.png" width="128" alt="logo">
+
 # Pocket dimensions for Paper
 
 ## Build
