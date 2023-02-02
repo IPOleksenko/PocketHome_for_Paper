@@ -1,9 +1,11 @@
+import java.io.ByteArrayOutputStream
+
 plugins {
     id("java")
 }
 
-group = project.properties["maven_group"].toString()
-version = project.properties["plugin_version"].toString()+getVersionMetadata()
+group = "dev.ipoleksenko"
+version = "git --no-pager describe --always".runCommand()
 
 repositories {
     mavenCentral()
@@ -26,6 +28,7 @@ tasks {
         filesMatching("plugin.yml") {
             expand(props)
         }
+        version = getVersionMetadata()
     }
 }
 
@@ -33,6 +36,16 @@ fun getVersionMetadata(): String {
     val buildId = System.getenv("GITHUB_RUN_NUMBER")
 
     if (buildId != null)
-        return "+build.${buildId}"
-    return ""
+        return version.toString() + "+build.${buildId}"
+    return version.toString()
+}
+
+fun String.runCommand(currentWorkingDir: File = file("./")): String {
+    val byteOut = ByteArrayOutputStream()
+    project.exec {
+        workingDir = currentWorkingDir
+        commandLine = this@runCommand.split("\\s".toRegex())
+        standardOutput = byteOut
+    }
+    return String(byteOut.toByteArray()).trim()
 }
