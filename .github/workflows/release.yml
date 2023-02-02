@@ -25,4 +25,4 @@ jobs:
           prerelease: false
           files: |
             build/libs/*[0-9].jar
-            build/libs/*[0-9].sources.jar
+            build/libs/*[0-9]-sources.jar
