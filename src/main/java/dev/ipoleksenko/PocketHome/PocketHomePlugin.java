@@ -12,6 +12,10 @@ public class PocketHomePlugin extends JavaPlugin {
         return instance;
     }
 
+    public PocketManager getWorldManager() {
+        return this.pocketManager;
+    }
+
     @Override
     public void onEnable() {
         instance = this;
@@ -21,9 +25,5 @@ public class PocketHomePlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-    }
-
-    public PocketManager getWorldManager() {
-        return this.pocketManager;
     }
 }
