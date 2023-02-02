@@ -13,7 +13,8 @@ import java.util.List;
 public class PocketChunkGenerator extends ChunkGenerator {
 
 	@Override
-	public @NotNull List<BlockPopulator> getDefaultPopulators(@NotNull World world) {
+	@NotNull
+	public List<BlockPopulator> getDefaultPopulators(@NotNull World world) {
 		return Collections.emptyList();
 	}
 
