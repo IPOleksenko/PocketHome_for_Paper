@@ -28,12 +28,12 @@ public class PocketManager {
 		World world = Bukkit.createWorld(this.getWorldCreator(worldName));
 		if (world == null) return null;
 
-		for (int x = 0; x < 16; ++x)
-			for (int z = 0; z < 16; ++z) {
+		for (int x = -16; x < 16; ++x)
+			for (int z = -16; z < 16; ++z) {
 				world.getBlockAt(x, 0, z).setType(Material.BEDROCK);
-				world.getBlockAt(x, 0, -z - 1).setType(Material.BEDROCK);
-				world.getBlockAt(-x - 1, 0, z).setType(Material.BEDROCK);
-				world.getBlockAt(-x - 1, 0, -z - 1).setType(Material.BEDROCK);
+				world.getBlockAt(x, 1, z).setType(Material.DIRT);
+				world.getBlockAt(x, 2, z).setType(Material.DIRT);
+				world.getBlockAt(x, 3, z).setType(Material.GRASS_BLOCK);
 			}
 
 		world.getBlockAt(0, 1, 0).setType(Material.ENDER_CHEST);
