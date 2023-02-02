@@ -32,9 +32,9 @@ public class PocketManager {
 
 
 	@Nullable
-	private World getPocket(String pocketName) {
+	private World getPocket(String pocketName, boolean createIfMissing) {
 		World pocket = Bukkit.getWorld(this.getPocketPath(pocketName));
-		if (pocket == null)
+		if (pocket == null && createIfMissing)
 			pocket = this.createPocket(pocketName);
 
 		return pocket;
