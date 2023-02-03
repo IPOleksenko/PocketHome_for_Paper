@@ -1,8 +1,11 @@
 #! /bin/sh
 
 cd "$(dirname "$0")"/.. || exit 0
-./gradlew build
-
+if ./gradlew build; then
+  echo
+else
+  exit 0
+fi
 cd "$(dirname "$0")" || exit 0
 
 plugin_wildcard="PocketHome-*[0-9].jar"
