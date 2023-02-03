@@ -12,14 +12,13 @@ public class PocketHomePlugin extends JavaPlugin {
 		return instance;
 	}
 
-	public PocketManager getWorldManager() {
+	public PocketManager getPocketManager() {
 		return this.pocketManager;
 	}
 
 	@Override
 	public void onEnable() {
 		instance = this;
-
 		pocketManager = new PocketManager(new PocketChunkGenerator());
 	}
 
