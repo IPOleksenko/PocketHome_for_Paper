@@ -11,7 +11,6 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
-import java.util.Objects;
 import java.util.UUID;
 
 public class PocketManager {
@@ -104,7 +103,7 @@ public class PocketManager {
 		World pocket = null;
 		if (container.has(KEY)) {
 			final UUID uuid = container.get(KEY, new UUIDDataType());
-			pocket = Bukkit.getWorld(Objects.requireNonNull(uuid));
+			pocket = Bukkit.getWorld(uuid);
 		} else if (createIfMissing)
 			pocket = this.createPocket(player);
 
@@ -114,7 +113,7 @@ public class PocketManager {
 	@Nullable
 	private World createPocket(@NotNull Player player) {
 		final String pocketName = player.getName();
-		World pocket = Bukkit.createWorld(this.getPocketCreator(this.getPocketPath(pocketName)));
+		World pocket = this.getPocketCreator(this.getPocketPath(pocketName)).createWorld();
 		if (pocket == null) return null;
 
 		PersistentDataContainer container = player.getPersistentDataContainer();
