@@ -34,7 +34,7 @@ public class PocketHomePlugin extends JavaPlugin {
 
 		File[] dirPockets = dir.listFiles();
 		if (dirPockets == null) return;
-		
+
 		for (File file : dirPockets)
 			if (file.isDirectory()) {
 				String[] pocketFiles = file.list();
