@@ -24,7 +24,7 @@ if test -n "$(find plugins/ -maxdepth 1 -name "$plugin_wildcard" -print -quit)";
 fi
 
 if test -n "$(find ../build/libs/ -maxdepth 1 -name "$plugin_wildcard" -print -quit)"; then
-  cp "$(find ../build/libs/ -name "${plugin_wildcard}" | tail -1)" plugins/
+  cp "$(find ../build/libs/ -name "${plugin_wildcard}" -print0 | xargs -r -0 ls -1 -t | head -1)" plugins/
 fi
 
 java \
