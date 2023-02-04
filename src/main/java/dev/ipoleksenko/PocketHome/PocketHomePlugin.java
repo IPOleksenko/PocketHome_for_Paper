@@ -9,13 +9,24 @@ import java.io.File;
 import java.util.Arrays;
 
 public class PocketHomePlugin extends JavaPlugin {
-	public static PocketHomePlugin instance;
+
+	private static PocketHomePlugin instance;
 	private PocketManager pocketManager;
 
+	/**
+	 * Get PocketHome plugin instance
+	 *
+	 * @return PocketHome plugin instance
+	 */
 	public static PocketHomePlugin getInstance() {
 		return instance;
 	}
 
+	/**
+	 * Get PocketManager instance
+	 *
+	 * @return PocketManager instance
+	 */
 	public PocketManager getPocketManager() {
 		return this.pocketManager;
 	}
@@ -28,6 +39,14 @@ public class PocketHomePlugin extends JavaPlugin {
 		loadPocketWorlds();
 	}
 
+	@Override
+	public void onDisable() {
+	}
+
+
+	/**
+	 * Preload (re-create) pocket worlds to be able to teleport into it
+	 */
 	private void loadPocketWorlds() {
 		File dir = new File("./pockets/");
 		if (!dir.exists()) return;
@@ -41,9 +60,5 @@ public class PocketHomePlugin extends JavaPlugin {
 				if (pocketFiles != null && Arrays.asList(pocketFiles).contains("level.dat"))
 					WorldCreator.name("pockets/" + file.getName()).createWorld();
 			}
-	}
-
-	@Override
-	public void onDisable() {
 	}
 }
