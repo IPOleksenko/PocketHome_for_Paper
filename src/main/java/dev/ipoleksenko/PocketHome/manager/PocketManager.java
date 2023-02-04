@@ -91,7 +91,6 @@ public class PocketManager {
 
 		player.teleport(pocket.getSpawnLocation());
 		player.setInvulnerable(true);
-		player.setAllowFlight(true);
 		return true;
 	}
 
@@ -112,8 +111,6 @@ public class PocketManager {
 
 		player.teleport(location);
 		player.setInvulnerable(false);
-		player.setAllowFlight(false);
-		player.setFlying(false);
 	}
 
 
