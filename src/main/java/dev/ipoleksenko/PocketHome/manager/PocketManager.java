@@ -87,6 +87,7 @@ public class PocketManager {
 	 * @param player player instance
 	 */
 	public void teleportFromPocket(@NotNull Player player) {
+		player.sendMessage("Teleport from HOME...");
 		World world = Bukkit.getWorlds().get(0);
 
 		player.teleport(world.getSpawnLocation());
@@ -125,19 +126,23 @@ public class PocketManager {
 	}
 
 	private void generateIsland(World pocket) {
-		for (int x = -16; x < 16; ++x)
-			for (int z = -16; z < 16; ++z) {
-				pocket.getBlockAt(x, 0, z).setType(Material.BEDROCK);
-				pocket.getBlockAt(x, 1, z).setType(Material.DIRT);
-				pocket.getBlockAt(x, 2, z).setType(Material.DIRT);
-				pocket.getBlockAt(x, 3, z).setType(Material.GRASS_BLOCK);
+		for (int x = -32; x < 32; ++x)
+			for (int z = -32; z < 32; ++z) {
+				pocket.getBlockAt(x, -64, z).setType(Material.BEDROCK);
+				pocket.getBlockAt(x, 0, z).setType(Material.GRASS_BLOCK);
+				for (int y = -63; y < -3; ++y){
+					pocket.getBlockAt(x, y, z).setType(Material.STONE);
+				}
+				for (int y = -3; y < 0; ++y){
+					pocket.getBlockAt(x, y, z).setType(Material.DIRT);
+				}
 			}
 
 		pocket.getBlockAt(0, 1, 0).setType(Material.ENDER_CHEST);
 
 		WorldBorder border = pocket.getWorldBorder();
 		border.setCenter(0., 0.);
-		border.setSize(32);
+		border.setSize(64);
 		border.setWarningDistance(0);
 	}
 }
