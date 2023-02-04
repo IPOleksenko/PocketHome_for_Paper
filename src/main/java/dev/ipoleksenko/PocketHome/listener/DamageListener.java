@@ -9,15 +9,15 @@ import org.jetbrains.annotations.NotNull;
 
 public class DamageListener implements Listener {
 
-    @EventHandler
-    public void onDamageVoid(@NotNull EntityDamageEvent event) {
-        if (event.getCause() == EntityDamageEvent.DamageCause.VOID) {
-            Player player = (Player) event.getEntity();
-            if (PocketHomePlugin.getInstance().getPocketManager().isInPocket(player)) {
-                player.setFallDistance(0);
-                PocketHomePlugin.getInstance().getPocketManager().teleportFromPocket(player);
-                event.setCancelled(true);
-            }
-        }
-    }
+	@EventHandler
+	public void onDamageVoid(@NotNull EntityDamageEvent event) {
+		if (event.getCause() == EntityDamageEvent.DamageCause.VOID) {
+			Player player = (Player) event.getEntity();
+			if (PocketHomePlugin.getInstance().getPocketManager().isInPocket(player)) {
+				player.setFallDistance(0);
+				PocketHomePlugin.getInstance().getPocketManager().teleportFromPocket(player);
+				event.setCancelled(true);
+			}
+		}
+	}
 }

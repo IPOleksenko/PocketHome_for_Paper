@@ -51,12 +51,12 @@ public class PocketHomePlugin extends JavaPlugin {
 		instance = this;
 		pocketManager = new PocketManager(new PocketChunkGenerator());
 
-    this.loadPocketWorlds();
+		this.loadPocketWorlds();
 
-    getServer().getPluginManager().registerEvents(new EnderChestListener(), this);
-    getServer().getPluginManager().registerEvents(new PlayerListener(), this);
-    getServer().getPluginManager().registerEvents(new DamageListener(), this);
-  }
+		getServer().getPluginManager().registerEvents(new EnderChestListener(), this);
+		getServer().getPluginManager().registerEvents(new PlayerListener(), this);
+		getServer().getPluginManager().registerEvents(new DamageListener(), this);
+	}
 
 	@Override
 	public void onDisable() {

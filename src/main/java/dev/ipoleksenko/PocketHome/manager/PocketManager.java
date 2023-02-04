@@ -101,14 +101,11 @@ public class PocketManager {
 	 * @param player player instance
 	 */
 	public void teleportFromPocket(@NotNull Player player) {
-		player.sendMessage("Teleport from HOME...");
-
 		PersistentDataContainer container = player.getPersistentDataContainer();
 		Location location = container.get(teleportLocationKey, new LocationDataType());
 
 		if (location == null)
 			location = player.getBedSpawnLocation();
-
 
 		if (location == null)
 			location = Bukkit.getWorlds().get(0).getSpawnLocation();
@@ -153,10 +150,10 @@ public class PocketManager {
 			for (int z = -32; z < 32; ++z) {
 				pocket.getBlockAt(x, -64, z).setType(Material.BEDROCK);
 				pocket.getBlockAt(x, 0, z).setType(Material.GRASS_BLOCK);
-				for (int y = -63; y < -3; ++y){
+				for (int y = -63; y < -3; ++y) {
 					pocket.getBlockAt(x, y, z).setType(Material.STONE);
 				}
-				for (int y = -3; y < 0; ++y){
+				for (int y = -3; y < 0; ++y) {
 					pocket.getBlockAt(x, y, z).setType(Material.DIRT);
 				}
 			}
