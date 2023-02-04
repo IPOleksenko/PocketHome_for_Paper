@@ -64,14 +64,14 @@ public class PocketHomePlugin extends JavaPlugin {
 		File dir = new File(getPocketsDir());
 		if (!dir.exists()) return;
 
-		File[] dirPockets = dir.listFiles();
-		if (dirPockets == null) return;
+		File[] pocketDirs = dir.listFiles();
+		if (pocketDirs == null) return;
 
-		for (File file : dirPockets)
-			if (file.isDirectory()) {
-				String[] pocketFiles = file.list();
+		for (File pocketDir : pocketDirs)
+			if (pocketDir.isDirectory()) {
+				String[] pocketFiles = pocketDir.list();
 				if (pocketFiles != null && Arrays.asList(pocketFiles).contains("level.dat"))
-					WorldCreator.name(getPocketsDir() + file.getName()).createWorld();
+					getPocketManager().getPocketCreator(getPocketsDir() + pocketDir.getName()).createWorld();
 			}
 	}
 }

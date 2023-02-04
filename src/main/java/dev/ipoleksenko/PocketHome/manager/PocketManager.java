@@ -41,7 +41,7 @@ public class PocketManager {
 	}
 
 	@NotNull
-	private WorldCreator getPocketCreator(String pocketName) {
+	public WorldCreator getPocketCreator(String pocketName) {
 		return new WorldCreator(pocketName)
 						.generator(getGenerator())
 						.environment(World.Environment.NORMAL);
