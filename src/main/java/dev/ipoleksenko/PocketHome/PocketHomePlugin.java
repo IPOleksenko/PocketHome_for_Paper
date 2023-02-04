@@ -1,6 +1,9 @@
 package dev.ipoleksenko.PocketHome;
 
 import dev.ipoleksenko.PocketHome.generator.PocketChunkGenerator;
+import dev.ipoleksenko.PocketHome.listener.DamageListener;
+import dev.ipoleksenko.PocketHome.listener.EnderChestListener;
+import dev.ipoleksenko.PocketHome.listener.PlayerListener;
 import dev.ipoleksenko.PocketHome.manager.PocketManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Contract;
@@ -48,8 +51,12 @@ public class PocketHomePlugin extends JavaPlugin {
 		instance = this;
 		pocketManager = new PocketManager(new PocketChunkGenerator());
 
-		this.loadPocketWorlds();
-	}
+    this.loadPocketWorlds();
+
+    getServer().getPluginManager().registerEvents(new EnderChestListener(), this);
+    getServer().getPluginManager().registerEvents(new PlayerListener(), this);
+    getServer().getPluginManager().registerEvents(new DamageListener(), this);
+  }
 
 	@Override
 	public void onDisable() {
