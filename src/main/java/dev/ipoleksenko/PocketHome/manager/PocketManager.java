@@ -2,6 +2,7 @@ package dev.ipoleksenko.PocketHome.manager;
 
 import dev.ipoleksenko.PocketHome.PocketHomePlugin;
 import dev.ipoleksenko.PocketHome.generator.PocketChunkGenerator;
+import dev.ipoleksenko.PocketHome.util.LocationDataType;
 import dev.ipoleksenko.PocketHome.util.UUIDDataType;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
@@ -19,11 +20,13 @@ import java.util.UUID;
 public class PocketManager {
 
 	private final NamespacedKey pocketUIDKey;
+	private final NamespacedKey teleportLocationKey;
 	private final PocketChunkGenerator generator;
 
 
 	public PocketManager(PocketChunkGenerator generator) {
 		this.pocketUIDKey = NamespacedKey.fromString("pocket", PocketHomePlugin.getInstance());
+		this.teleportLocationKey = NamespacedKey.fromString("teleport_location", PocketHomePlugin.getInstance());
 		this.generator = generator;
 	}
 
@@ -83,6 +86,9 @@ public class PocketManager {
 		World pocket = this.getPocket(otherPlayer, player == otherPlayer);
 		if (pocket == null) return false;
 
+		PersistentDataContainer container = player.getPersistentDataContainer();
+		container.set(teleportLocationKey, new LocationDataType(), player.getLocation());
+
 		player.teleport(pocket.getSpawnLocation());
 		player.setInvulnerable(true);
 		player.setAllowFlight(true);
@@ -95,9 +101,16 @@ public class PocketManager {
 	 * @param player player instance
 	 */
 	public void teleportFromPocket(@NotNull Player player) {
-		World world = Bukkit.getWorlds().get(0);
+		PersistentDataContainer container = player.getPersistentDataContainer();
+		Location location = container.get(teleportLocationKey, new LocationDataType());
 
-		player.teleport(world.getSpawnLocation());
+		if (location == null)
+			location = player.getBedSpawnLocation();
+
+		if (location == null)
+			location = Bukkit.getWorlds().get(0).getSpawnLocation();
+
+		player.teleport(location);
 		player.setInvulnerable(false);
 		player.setAllowFlight(false);
 		player.setFlying(false);
@@ -126,6 +139,8 @@ public class PocketManager {
 		container.set(pocketUIDKey, new UUIDDataType(), pocket.getUID());
 
 		generateIsland(pocket);
+
+		pocket.setSpawnLocation(1, 0, -1);
 
 		return pocket;
 	}
