@@ -18,12 +18,12 @@ import java.util.UUID;
  */
 public class PocketManager {
 
-	private final NamespacedKey key;
+	private final NamespacedKey pocketUIDKey;
 	private final PocketChunkGenerator generator;
 
 
 	public PocketManager(PocketChunkGenerator generator) {
-		this.key = NamespacedKey.fromString("pocket", PocketHomePlugin.getInstance());
+		this.pocketUIDKey = NamespacedKey.fromString("pocket", PocketHomePlugin.getInstance());
 		this.generator = generator;
 	}
 
@@ -108,12 +108,10 @@ public class PocketManager {
 	@Nullable
 	private World getPocket(@NotNull Player player, boolean createIfMissing) {
 		PersistentDataContainer container = player.getPersistentDataContainer();
+		final UUID pocketUID = container.get(pocketUIDKey, new UUIDDataType());
+		World pocket = Bukkit.getWorld(pocketUID);
 
-		World pocket = null;
-		if (container.has(key)) {
-			final UUID uuid = container.get(key, new UUIDDataType());
-			pocket = Bukkit.getWorld(uuid);
-		} else if (createIfMissing)
+		if (pocket == null && createIfMissing)
 			pocket = this.createPocket(player);
 
 		return pocket;
@@ -126,7 +124,7 @@ public class PocketManager {
 		if (pocket == null) return null;
 
 		PersistentDataContainer container = player.getPersistentDataContainer();
-		container.set(key, new UUIDDataType(), pocket.getUID());
+		container.set(pocketUIDKey, new UUIDDataType(), pocket.getUID());
 
 		generateIsland(pocket);
 
