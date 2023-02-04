@@ -13,6 +13,9 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nullable;
 import java.util.UUID;
 
+/**
+ * Manager for pocket worlds
+ */
 public class PocketManager {
 
 	private final NamespacedKey KEY;
@@ -25,6 +28,11 @@ public class PocketManager {
 	}
 
 
+	/**
+	 * Used for saving pockets in separate folder
+	 * @param pocketName name of a pocket
+	 * @return pockets/`pocketName`
+	 */
 	@Contract(pure = true)
 	@NotNull
 	private String getPocketPath(String pocketName) {

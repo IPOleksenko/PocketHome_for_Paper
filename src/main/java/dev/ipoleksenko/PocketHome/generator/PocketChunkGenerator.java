@@ -10,6 +10,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Generates a total void world
+ */
 public class PocketChunkGenerator extends ChunkGenerator {
 
 	@Override

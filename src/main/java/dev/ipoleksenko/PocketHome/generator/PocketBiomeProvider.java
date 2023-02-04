@@ -7,7 +7,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+/**
+ * Provides minecraft:the_void biomes for all pocket worlds
+ */
 public class PocketBiomeProvider extends BiomeProvider {
+
 	@Override
 	@NotNull
 	public Biome getBiome(@NotNull WorldInfo worldInfo, int x, int y, int z) {
