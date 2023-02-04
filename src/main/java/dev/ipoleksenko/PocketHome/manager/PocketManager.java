@@ -80,8 +80,7 @@ public class PocketManager {
 	 * @return true if success, false otherwise
 	 */
 	public boolean teleportToPocket(@NotNull Player player, @NotNull Player otherPlayer) {
-		boolean playerEquals = player.getName().equals(otherPlayer.getName());
-		World pocket = this.getPocket(otherPlayer, playerEquals);
+		World pocket = this.getPocket(otherPlayer, player == otherPlayer);
 		if (pocket == null) return false;
 
 		player.teleport(pocket.getSpawnLocation());
