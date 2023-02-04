@@ -4,12 +4,15 @@ import dev.ipoleksenko.PocketHome.generator.PocketChunkGenerator;
 import dev.ipoleksenko.PocketHome.manager.PocketManager;
 import org.bukkit.WorldCreator;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.Arrays;
 
 public class PocketHomePlugin extends JavaPlugin {
 
+	private static final String pocketsDir = "pockets";
 	private static PocketHomePlugin instance;
 	private PocketManager pocketManager;
 
@@ -20,6 +23,16 @@ public class PocketHomePlugin extends JavaPlugin {
 	 */
 	public static PocketHomePlugin getInstance() {
 		return instance;
+	}
+
+	/**
+	 * Get pockets directory
+	 *
+	 * @return Pockets directory
+	 */
+	@Contract(pure = true)
+	public static @NotNull String getPocketsDir() {
+		return pocketsDir + '/';
 	}
 
 	/**
@@ -36,7 +49,7 @@ public class PocketHomePlugin extends JavaPlugin {
 		instance = this;
 		pocketManager = new PocketManager(new PocketChunkGenerator());
 
-		loadPocketWorlds();
+		this.loadPocketWorlds();
 	}
 
 	@Override
@@ -48,7 +61,7 @@ public class PocketHomePlugin extends JavaPlugin {
 	 * Preload (re-create) pocket worlds to be able to teleport into it
 	 */
 	private void loadPocketWorlds() {
-		File dir = new File("./pockets/");
+		File dir = new File(getPocketsDir());
 		if (!dir.exists()) return;
 
 		File[] dirPockets = dir.listFiles();
@@ -58,7 +71,7 @@ public class PocketHomePlugin extends JavaPlugin {
 			if (file.isDirectory()) {
 				String[] pocketFiles = file.list();
 				if (pocketFiles != null && Arrays.asList(pocketFiles).contains("level.dat"))
-					WorldCreator.name("pockets/" + file.getName()).createWorld();
+					WorldCreator.name(getPocketsDir() + file.getName()).createWorld();
 			}
 	}
 }

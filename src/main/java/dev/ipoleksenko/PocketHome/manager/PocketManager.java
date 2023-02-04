@@ -36,7 +36,7 @@ public class PocketManager {
 	@Contract(pure = true)
 	@NotNull
 	private String getPocketPath(String pocketName) {
-		return "pockets/" + pocketName;
+		return PocketHomePlugin.getPocketsDir() + pocketName;
 	}
 
 	@NotNull
@@ -58,7 +58,7 @@ public class PocketManager {
 	 * @return true, if in a pocket, false otherwise
 	 */
 	public boolean isInPocket(@NotNull Player player) {
-		return player.getWorld().getName().contains("pockets/");
+		return player.getWorld().getName().contains(PocketHomePlugin.getPocketsDir());
 	}
 
 	/**
