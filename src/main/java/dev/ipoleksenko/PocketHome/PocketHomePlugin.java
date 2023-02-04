@@ -2,7 +2,6 @@ package dev.ipoleksenko.PocketHome;
 
 import dev.ipoleksenko.PocketHome.generator.PocketChunkGenerator;
 import dev.ipoleksenko.PocketHome.manager.PocketManager;
-import org.bukkit.WorldCreator;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
