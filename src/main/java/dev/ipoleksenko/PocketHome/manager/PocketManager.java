@@ -34,8 +34,8 @@ public class PocketManager {
 	/**
 	 * Used for saving pockets in separate folder
 	 *
-	 * @param pocketName name of a pocket
-	 * @return pockets/`pocketName`
+	 * @param pocketName Name of a pocket
+	 * @return <i>pocketsDir</i>/<i>pocketName</i>
 	 */
 	@Contract(pure = true)
 	@NotNull
@@ -43,6 +43,12 @@ public class PocketManager {
 		return PocketHomePlugin.getPocketsDir() + pocketName;
 	}
 
+	/**
+	 * Get WorldCreator for pocket worlds
+	 *
+	 * @param pocketName Name of a pocket
+	 * @return WorldCreator for pocket worlds instance
+	 */
 	@NotNull
 	public WorldCreator getPocketCreator(String pocketName) {
 		return new WorldCreator(pocketName)
@@ -68,7 +74,7 @@ public class PocketManager {
 	/**
 	 * Teleports player to his pocket
 	 *
-	 * @param player Player instance
+	 * @param player Target Player instance
 	 * @return true if success, false otherwise
 	 */
 	public boolean teleportToPocket(Player player) {
@@ -76,11 +82,11 @@ public class PocketManager {
 	}
 
 	/**
-	 * Teleports player to other's player pocket
+	 * Teleports player to a specified player pocket
 	 *
-	 * @param player      Player instance
-	 * @param otherPlayer destination Player instance
-	 * @return true if success, false otherwise
+	 * @param player      Target Player instance
+	 * @param otherPlayer Destination Player instance
+	 * @return True on successful teleport, false if pocket does not exist
 	 */
 	public boolean teleportToPocket(@NotNull Player player, @NotNull Player otherPlayer) {
 		World pocket = this.getPocket(otherPlayer, player == otherPlayer);
@@ -95,9 +101,12 @@ public class PocketManager {
 	}
 
 	/**
-	 * Teleports player to overworld
+	 * Teleports player to overworld.
+	 * Trying to teleport to the latest location.
+	 * Teleports to bed spawn location if the latest location does not exist.
+	 * Otherwise, teleports to the overworld spawn
 	 *
-	 * @param player player instance
+	 * @param player Target Player instance
 	 */
 	public void teleportFromPocket(@NotNull Player player) {
 		PersistentDataContainer container = player.getPersistentDataContainer();
