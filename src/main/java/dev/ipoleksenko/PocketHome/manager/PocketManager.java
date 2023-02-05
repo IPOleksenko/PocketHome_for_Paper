@@ -54,8 +54,8 @@ public class PocketManager {
 	/**
 	 * Get WorldCreator for pocket worlds
 	 *
-	 * @param pocketName Name of a pocket
-	 * @return WorldCreator for pocket worlds instance
+	 * @param pocketName name of a pocket
+	 * @return WorldCreator for pocket worlds object
 	 */
 	@NotNull
 	public WorldCreator getPocketCreator(String pocketName) {
@@ -72,7 +72,7 @@ public class PocketManager {
 	/**
 	 * Checks if a player is in a pocket
 	 *
-	 * @param player Player instance
+	 * @param player Player object
 	 * @return true, if in a pocket, false otherwise
 	 */
 	public boolean isInPocket(@NotNull Player player) {
@@ -82,8 +82,8 @@ public class PocketManager {
 	/**
 	 * Teleports player to his pocket
 	 *
-	 * @param player Target Player instance
-	 * @return true if success, false otherwise
+	 * @param player target Player object
+	 * @return true on successful teleport, false if pocket does not exist
 	 */
 	public boolean teleportToPocket(Player player) {
 		return this.teleportToPocket(player, player);
@@ -92,9 +92,9 @@ public class PocketManager {
 	/**
 	 * Teleports player to a specified player pocket
 	 *
-	 * @param player      Target Player instance
-	 * @param otherPlayer Destination Player instance
-	 * @return True on successful teleport, false if pocket does not exist
+	 * @param player      target Player object
+	 * @param otherPlayer destination Player object
+	 * @return true on successful teleport, false if pocket does not exist
 	 */
 	public boolean teleportToPocket(@NotNull Player player, @NotNull Player otherPlayer) {
 		World pocket = this.getPocket(otherPlayer, player == otherPlayer);
@@ -125,9 +125,10 @@ public class PocketManager {
 	 * Teleports to bed spawn location if the latest location does not exist.
 	 * Otherwise, teleports to the overworld spawn
 	 *
-	 * @param player Target Player instance
+	 * @param player target Player object
+	 * @return always true
 	 */
-	public void teleportFromPocket(@NotNull Player player) {
+	public boolean teleportFromPocket(@NotNull Player player) {
 		PersistentDataContainer container = player.getPersistentDataContainer();
 		Location location = container.get(teleportLocationKey, new LocationDataType());
 
@@ -139,6 +140,8 @@ public class PocketManager {
 
 		player.teleport(location);
 		player.setInvulnerable(false);
+
+		return true;
 	}
 
 	/**
