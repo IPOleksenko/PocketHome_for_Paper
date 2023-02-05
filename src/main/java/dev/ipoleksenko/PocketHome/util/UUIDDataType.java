@@ -33,8 +33,8 @@ public class UUIDDataType implements PersistentDataType<byte[], UUID> {
 	@NotNull
 	public UUID fromPrimitive(byte @NotNull [] primitive, @NotNull PersistentDataAdapterContext context) {
 		ByteBuffer bb = ByteBuffer.wrap(primitive);
-		long firstLong = bb.getLong();
-		long secondLong = bb.getLong();
-		return new UUID(firstLong, secondLong);
+		long mostSigBits = bb.getLong();
+		long leastSigBits = bb.getLong();
+		return new UUID(mostSigBits, leastSigBits);
 	}
 }
