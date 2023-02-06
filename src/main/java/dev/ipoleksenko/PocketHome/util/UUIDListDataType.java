@@ -8,11 +8,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-public class UUIDListDataType implements PersistentDataType<int[][], List> {
+public class UUIDListDataType implements PersistentDataType<int[], List> {
 	@Override
 	@NotNull
-	public Class<int[][]> getPrimitiveType() {
-		return int[][].class;
+	public Class<int[]> getPrimitiveType() {
+		return int[].class;
 	}
 
 	@Override
@@ -22,19 +22,28 @@ public class UUIDListDataType implements PersistentDataType<int[][], List> {
 	}
 
 	@Override
-	public int @NotNull [][] toPrimitive(@NotNull List complex, @NotNull PersistentDataAdapterContext context) {
-		int[][] primitive = new int[complex.size()][4];
+	public int @NotNull [] toPrimitive(@NotNull List complex, @NotNull PersistentDataAdapterContext context) {
+		int[] primitive = new int[complex.size() * 4];
 		List<int[]> ints = ((List<UUID>) complex).stream().map(UUIDDataType::toInts).toList();
 
-		for (int i = 0; i < ints.size(); ++i)
-			primitive[i] = ints.get(i);
+		for (int i = 0; i < ints.size(); ++i) {
+			primitive[i] = ints.get(i / 4)[i % 4];
+			primitive[++i] = ints.get(i / 4)[i % 4];
+			primitive[++i] = ints.get(i / 4)[i % 4];
+			primitive[++i] = ints.get(i / 4)[i % 4];
+		}
 
 		return primitive;
 	}
 
 	@Override
 	@NotNull
-	public List<UUID> fromPrimitive(int @NotNull [][] primitive, @NotNull PersistentDataAdapterContext context) {
-		return Arrays.stream(primitive).map(UUIDDataType::fromInts).toList();
+	public List<UUID> fromPrimitive(int @NotNull [] primitive, @NotNull PersistentDataAdapterContext context) {
+		int[][] ints = new int[primitive.length / 4][4];
+
+		for (int i = 0; i < primitive.length / 4; ++i)
+			System.arraycopy(primitive, i * 4, ints[i], 0, 4);
+
+		return Arrays.stream(ints).map(UUIDDataType::fromInts).toList();
 	}
 }
