@@ -17,6 +17,12 @@ import java.util.UUID;
 
 /**
  * Manager for pocket worlds
+ * <p/>
+ * Keys:<br/>
+ * pockethome:pocket — UUID of Pocket inside Player<br/>
+ * pockethome:pocket_owner — UUID of Player inside Pocket<br/>
+ * pockethome:pocket_guests — List<UUID> of Pockets inside Player, of Players inside Pocket<br/>
+ * pockethome:teleport_location — Location of Player inside Player<br/>
  */
 public class PocketManager {
 
@@ -37,9 +43,9 @@ public class PocketManager {
 
 
 	/**
-	 * Used for saving pockets in separate folder
+	 * Used for saving Pocket in separate folder
 	 *
-	 * @param pocketName Name of a pocket
+	 * @param pocketName name of a Pocket
 	 * @return <i>pocketsDir</i>/<i>pocketName</i>
 	 */
 	@Contract(pure = true)
@@ -49,7 +55,7 @@ public class PocketManager {
 	}
 
 	/**
-	 * Get WorldCreator for pocket worlds
+	 * Get WorldCreator for Pocket worlds
 	 *
 	 * @param pocketName name of a pocket
 	 * @return WorldCreator for pocket worlds object
@@ -65,7 +71,7 @@ public class PocketManager {
 
 
 	/**
-	 * Checks if a player is in a pocket
+	 * Checks if a player is in a Pocket
 	 *
 	 * @param player Player object
 	 * @return true, if in a pocket, false otherwise
@@ -75,17 +81,17 @@ public class PocketManager {
 	}
 
 	/**
-	 * Teleports player to his pocket
+	 * Teleports player to his Pocket
 	 *
 	 * @param player target Player object
-	 * @return true on successful teleport, false if pocket does not exist
+	 * @return true on successful teleport
 	 */
 	public boolean teleportToPocket(Player player) {
 		return this.teleportToPocket(player, player);
 	}
 
 	/**
-	 * Teleports player to a specified player pocket
+	 * Teleports player to a specified Player Pocket
 	 *
 	 * @param player      target Player object
 	 * @param otherPlayer destination Player object
@@ -99,10 +105,10 @@ public class PocketManager {
 	}
 
 	/**
-	 * Teleports player to a specified pocket
+	 * Teleports player to a specified Pocket
 	 *
 	 * @param player target Player object
-	 * @param pocket destination pocket object
+	 * @param pocket destination Pocket object
 	 * @return always true
 	 */
 	public boolean teleportToPocket(@NotNull Player player, @NotNull World pocket) {
@@ -117,7 +123,7 @@ public class PocketManager {
 	}
 
 	/**
-	 * Teleports player to overworld.
+	 * Teleports Player to overworld.
 	 * Trying to teleport to the latest location.
 	 * Teleports to bed spawn location if the latest location does not exist.
 	 * Otherwise, teleports to the overworld spawn
@@ -140,11 +146,11 @@ public class PocketManager {
 	}
 
 	/**
-	 * Adds to Player pocket UUID. That Player will be able to visit pocket
+	 * Adds to Player Pocket UUID. That Player will be able to visit pocket
 	 *
-	 * @param owner Player object, pocket owner
-	 * @param guest Player object, guest that will be able to visit pocket
-	 * @return always true
+	 * @param owner Player object, Pocket owner
+	 * @param guest Player object, guest that will be able to visit Pocket
+	 * @return true on success, false if pocket does not exist
 	 */
 	public boolean addGuestToPocket(@NotNull Player owner, @NotNull Player guest) {
 		PersistentDataContainer ownerContainer = owner.getPersistentDataContainer();
@@ -172,11 +178,11 @@ public class PocketManager {
 	}
 
 	/**
-	 * Removes from Player pocket UUID. That Player will not be able to visit pocket
+	 * Removes from Player Pocket UUID. That Player will not be able to visit pocket
 	 *
-	 * @param owner Player object, pocket owner
-	 * @param guest Player object, guest that will not be able to visit pocket
-	 * @return always true
+	 * @param owner Player object, Pocket owner
+	 * @param guest Player object, guest that will not be able to visit Pocket
+	 * @return true on success, false if pocket does not exist
 	 */
 	public boolean removeGuestFromPocket(@NotNull Player owner, @NotNull Player guest) {
 		PersistentDataContainer ownerContainer = owner.getPersistentDataContainer();
@@ -206,10 +212,10 @@ public class PocketManager {
 	}
 
 	/**
-	 * Get all pockets that can be visited by Player
+	 * Get all Pockets that can be visited by Player
 	 *
 	 * @param player target Player object
-	 * @return List of available to visit pockets
+	 * @return List of available to visit Pockets
 	 */
 	public List<World> getGuestPockets(@NotNull Player player) {
 		PersistentDataContainer playerContainer = player.getPersistentDataContainer();
@@ -220,11 +226,10 @@ public class PocketManager {
 	}
 
 	/**
-	 * Get Player that owns pocket
+	 * Get Player that owns Pocket
 	 *
 	 * @param pocket Pocket object
 	 * @return OfflinePlayer object
-	 * Note: If player is online, it can easily be cast to Player with OfflinePlayer::getPlayer()
 	 */
 	public OfflinePlayer getPocketOwner(@NotNull World pocket) {
 		PersistentDataContainer pocketContainer = pocket.getPersistentDataContainer();
