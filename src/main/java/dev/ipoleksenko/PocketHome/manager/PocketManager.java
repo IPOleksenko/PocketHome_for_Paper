@@ -271,7 +271,11 @@ public class PocketManager {
 		if (pocketUID == null && createIfMissing) return this.createPocket(player);
 		if (pocketUID == null) return null;
 
-		return Bukkit.getWorld(pocketUID);
+		final World pocket = Bukkit.getWorld(pocketUID);
+
+		if (pocket == null && createIfMissing) return this.createPocket(player);
+
+		return pocket;
 	}
 
 	@Nullable
