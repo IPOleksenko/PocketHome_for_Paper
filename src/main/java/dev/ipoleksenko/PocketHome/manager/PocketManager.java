@@ -219,10 +219,35 @@ public class PocketManager {
 	 */
 	public List<World> getGuestPockets(@NotNull Player player) {
 		PersistentDataContainer playerContainer = player.getPersistentDataContainer();
-		List<UUID> playerGuestPocketsUID = playerContainer.get(pocketGuestsKey, DataType.UUID_LIST);
-		if (playerGuestPocketsUID == null) return new ArrayList<World>();
+		List<UUID> guestPocketsUID = playerContainer.get(pocketGuestsKey, DataType.UUID_LIST);
+		if (guestPocketsUID == null) return new ArrayList<World>();
 
-		return playerGuestPocketsUID.stream().map(Bukkit::getWorld).toList();
+		return guestPocketsUID.stream().map(Bukkit::getWorld).toList();
+	}
+
+	/**
+	 * Get guests of a Player Pocket
+	 *
+	 * @param player Player object, pocket owner
+	 * @return List of guests, null if player hasn't pocket
+	 */
+	public List<OfflinePlayer> getPocketGuests(@NotNull Player player) {
+		World pocket = this.getPocket(player, false);
+		return (pocket != null) ? this.getPocketGuests(pocket) : null;
+	}
+
+	/**
+	 * Get guests of a Pocket
+	 *
+	 * @param pocket Pocket object
+	 * @return List of guests
+	 */
+	public List<OfflinePlayer> getPocketGuests(@NotNull World pocket) {
+		PersistentDataContainer pocketContainer = pocket.getPersistentDataContainer();
+		List<UUID> pocketGuestsUID = pocketContainer.get(pocketGuestsKey, DataType.UUID_LIST);
+		if (pocketGuestsUID == null) return new ArrayList<OfflinePlayer>();
+
+		return pocketGuestsUID.stream().map(Bukkit::getOfflinePlayer).toList();
 	}
 
 	/**
