@@ -5,6 +5,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,6 +45,6 @@ public class UUIDListDataType implements PersistentDataType<int[], List> {
 		for (int i = 0; i < primitive.length / 4; ++i)
 			System.arraycopy(primitive, i * 4, ints[i], 0, 4);
 
-		return Arrays.stream(ints).map(UUIDDataType::fromInts).toList();
+		return new LinkedList<UUID>(Arrays.stream(ints).map(UUIDDataType::fromInts).toList());
 	}
 }
