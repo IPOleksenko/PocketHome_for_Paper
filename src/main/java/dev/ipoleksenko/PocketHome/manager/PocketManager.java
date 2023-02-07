@@ -290,27 +290,19 @@ public class PocketManager {
 		final PersistentDataContainer pocketContainer = pocket.getPersistentDataContainer();
 		pocketContainer.set(pocketOwnerKey, DataType.UUID, player.getUniqueId());
 
-		generateIsland(pocket);
+		generateMisc(pocket);
 
-		pocket.setSpawnLocation(1, 0, -1);
+		pocket.setSpawnLocation(1, 1, -1);
 
 		return pocket;
 	}
 
-	private void generateIsland(World pocket) {
-		for (int x = -16; x < 16; ++x)
-			for (int z = -16; z < 16; ++z) {
-				pocket.getBlockAt(x, 0, z).setType(Material.BEDROCK);
-				pocket.getBlockAt(x, 1, z).setType(Material.DIRT);
-				pocket.getBlockAt(x, 2, z).setType(Material.DIRT);
-				pocket.getBlockAt(x, 3, z).setType(Material.GRASS_BLOCK);
-			}
-
+	private void generateMisc(@NotNull World pocket) {
 		pocket.getBlockAt(0, 1, 0).setType(Material.ENDER_CHEST);
 
 		WorldBorder border = pocket.getWorldBorder();
 		border.setCenter(0., 0.);
-		border.setSize(32);
+		border.setSize(2 * PocketHomePlugin.getPocketRadius() * 16);
 		border.setWarningDistance(0);
 	}
 }

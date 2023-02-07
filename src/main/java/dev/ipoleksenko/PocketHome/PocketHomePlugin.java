@@ -11,7 +11,8 @@ import java.util.Arrays;
 
 public class PocketHomePlugin extends JavaPlugin {
 
-	private static final String pocketsDir = "pockets";
+	private static final String POCKETS_DIR = "pockets";
+	private static final Integer POCKET_RADIUS = 2; // in chunks; generate (2 * n)^2 chunks
 	private static PocketHomePlugin instance;
 	private PocketManager pocketManager;
 
@@ -31,7 +32,11 @@ public class PocketHomePlugin extends JavaPlugin {
 	 */
 	@Contract(pure = true)
 	public static @NotNull String getPocketsDir() {
-		return pocketsDir + '/';
+		return POCKETS_DIR + '/';
+	}
+
+	public static Integer getPocketRadius() {
+		return POCKET_RADIUS;
 	}
 
 	/**

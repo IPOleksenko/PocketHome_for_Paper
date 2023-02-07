@@ -16,9 +16,8 @@ import java.util.List;
 public class PocketChunkGenerator extends ChunkGenerator {
 
 	@Override
-	@NotNull
-	public List<BlockPopulator> getDefaultPopulators(@NotNull World world) {
-		return Collections.emptyList();
+	public @NotNull List<BlockPopulator> getDefaultPopulators(@NotNull World world) {
+		return Collections.singletonList(new PocketBlockPopulator());
 	}
 
 	@Override
