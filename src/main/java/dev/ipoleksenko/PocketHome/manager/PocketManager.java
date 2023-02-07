@@ -98,7 +98,7 @@ public class PocketManager {
 	 * @return true on successful teleport, false if pocket does not exist
 	 */
 	public boolean teleportToPocket(@NotNull Player player, @NotNull Player otherPlayer) {
-		World pocket = this.getPocket(otherPlayer, player == otherPlayer);
+		final World pocket = this.getPocket(otherPlayer, player == otherPlayer);
 		if (pocket == null) return false;
 
 		return this.teleportToPocket(player, pocket);
@@ -113,7 +113,7 @@ public class PocketManager {
 	 */
 	public boolean teleportToPocket(@NotNull Player player, @NotNull World pocket) {
 		if (!this.isInPocket(player)) {
-			PersistentDataContainer playerContainer = player.getPersistentDataContainer();
+			final PersistentDataContainer playerContainer = player.getPersistentDataContainer();
 			playerContainer.set(teleportLocationKey, DataType.LOCATION, player.getLocation());
 		}
 
@@ -132,8 +132,7 @@ public class PocketManager {
 	 * @return always true
 	 */
 	public boolean teleportFromPocket(@NotNull Player player) {
-		PersistentDataContainer playerContainer = player.getPersistentDataContainer();
-
+		final PersistentDataContainer playerContainer = player.getPersistentDataContainer();
 		Location location = playerContainer.get(teleportLocationKey, DataType.LOCATION);
 
 		if (location == null) location = player.getBedSpawnLocation();
@@ -141,7 +140,6 @@ public class PocketManager {
 
 		player.teleport(location);
 		player.setInvulnerable(false);
-
 		return true;
 	}
 
@@ -153,15 +151,15 @@ public class PocketManager {
 	 * @return true on success, false if pocket does not exist
 	 */
 	public boolean addGuestToPocket(@NotNull Player owner, @NotNull Player guest) {
-		PersistentDataContainer ownerContainer = owner.getPersistentDataContainer();
-		UUID pocketUID = ownerContainer.get(pocketUIDKey, DataType.UUID);
-		UUID guestUID = guest.getUniqueId();
+		final PersistentDataContainer ownerContainer = owner.getPersistentDataContainer();
+		final UUID pocketUID = ownerContainer.get(pocketUIDKey, DataType.UUID);
+		final UUID guestUID = guest.getUniqueId();
 
-		World pocket = this.getPocket(owner, false);
+		final World pocket = this.getPocket(owner, false);
 		if (pocket == null) return false;
 
-		PersistentDataContainer pocketContainer = pocket.getPersistentDataContainer();
-		PersistentDataContainer guestContainer = guest.getPersistentDataContainer();
+		final PersistentDataContainer pocketContainer = pocket.getPersistentDataContainer();
+		final PersistentDataContainer guestContainer = guest.getPersistentDataContainer();
 
 		this.addGuest(pocketContainer, guestUID);
 		this.addGuest(guestContainer, pocketUID);
@@ -177,20 +175,20 @@ public class PocketManager {
 	 * @return true on success, false if pocket does not exist
 	 */
 	public boolean removeGuestFromPocket(@NotNull Player owner, @NotNull Player guest) {
-		PersistentDataContainer ownerContainer = owner.getPersistentDataContainer();
-		UUID pocketUID = ownerContainer.get(pocketUIDKey, DataType.UUID);
-		UUID guestUID = guest.getUniqueId();
+		final PersistentDataContainer ownerContainer = owner.getPersistentDataContainer();
+		final UUID pocketUID = ownerContainer.get(pocketUIDKey, DataType.UUID);
+		final UUID guestUID = guest.getUniqueId();
 
-		World pocket = this.getPocket(owner, false);
+		final World pocket = this.getPocket(owner, false);
 		if (pocket == null) return false;
 
-		PersistentDataContainer pocketContainer = pocket.getPersistentDataContainer();
-		PersistentDataContainer guestContainer = guest.getPersistentDataContainer();
+		final PersistentDataContainer pocketContainer = pocket.getPersistentDataContainer();
+		final PersistentDataContainer guestContainer = guest.getPersistentDataContainer();
 
 		this.removeGuest(pocketContainer, guestUID);
 		this.removeGuest(guestContainer, pocketUID);
 
-		World guestWorld = guest.getWorld();
+		final World guestWorld = guest.getWorld();
 		if (guestWorld.getUID() == pocketUID) this.teleportFromPocket(guest);
 
 		return true;
@@ -203,8 +201,8 @@ public class PocketManager {
 	 * @return List of available to visit Pockets
 	 */
 	public List<World> getGuestPockets(@NotNull Player player) {
-		PersistentDataContainer playerContainer = player.getPersistentDataContainer();
-		List<UUID> guestPocketsUID = playerContainer.get(pocketGuestsKey, DataType.UUID_LIST);
+		final PersistentDataContainer playerContainer = player.getPersistentDataContainer();
+		final List<UUID> guestPocketsUID = playerContainer.get(pocketGuestsKey, DataType.UUID_LIST);
 		if (guestPocketsUID == null) return new ArrayList<World>();
 
 		return guestPocketsUID.stream().map(Bukkit::getWorld).toList();
@@ -217,7 +215,7 @@ public class PocketManager {
 	 * @return List of guests, null if player hasn't pocket
 	 */
 	public List<OfflinePlayer> getPocketGuests(@NotNull Player player) {
-		World pocket = this.getPocket(player, false);
+		final World pocket = this.getPocket(player, false);
 		return (pocket != null) ? this.getPocketGuests(pocket) : null;
 	}
 
@@ -228,8 +226,8 @@ public class PocketManager {
 	 * @return List of guests
 	 */
 	public List<OfflinePlayer> getPocketGuests(@NotNull World pocket) {
-		PersistentDataContainer pocketContainer = pocket.getPersistentDataContainer();
-		List<UUID> pocketGuestsUID = pocketContainer.get(pocketGuestsKey, DataType.UUID_LIST);
+		final PersistentDataContainer pocketContainer = pocket.getPersistentDataContainer();
+		final List<UUID> pocketGuestsUID = pocketContainer.get(pocketGuestsKey, DataType.UUID_LIST);
 		if (pocketGuestsUID == null) return new ArrayList<OfflinePlayer>();
 
 		return pocketGuestsUID.stream().map(Bukkit::getOfflinePlayer).toList();
@@ -242,8 +240,8 @@ public class PocketManager {
 	 * @return OfflinePlayer object
 	 */
 	public OfflinePlayer getPocketOwner(@NotNull World pocket) {
-		PersistentDataContainer pocketContainer = pocket.getPersistentDataContainer();
-		UUID ownerUID = pocketContainer.get(pocketOwnerKey, DataType.UUID);
+		final PersistentDataContainer pocketContainer = pocket.getPersistentDataContainer();
+		final UUID ownerUID = pocketContainer.get(pocketOwnerKey, DataType.UUID);
 
 		return Bukkit.getOfflinePlayer(ownerUID);
 	}
@@ -267,7 +265,7 @@ public class PocketManager {
 
 	@Nullable
 	private World getPocket(@NotNull Player player, boolean createIfMissing) {
-		PersistentDataContainer playerContainer = player.getPersistentDataContainer();
+		final PersistentDataContainer playerContainer = player.getPersistentDataContainer();
 		final UUID pocketUID = playerContainer.get(pocketUIDKey, DataType.UUID);
 
 		if (pocketUID == null && createIfMissing) return this.createPocket(player);
@@ -279,13 +277,13 @@ public class PocketManager {
 	@Nullable
 	private World createPocket(@NotNull Player player) {
 		final String pocketName = player.getName();
-		World pocket = this.getPocketCreator(this.getPocketPath(pocketName)).createWorld();
+		final World pocket = this.getPocketCreator(this.getPocketPath(pocketName)).createWorld();
 		if (pocket == null) return null;
 
-		PersistentDataContainer playerContainer = player.getPersistentDataContainer();
+		final PersistentDataContainer playerContainer = player.getPersistentDataContainer();
 		playerContainer.set(pocketUIDKey, DataType.UUID, pocket.getUID());
 
-		PersistentDataContainer pocketContainer = pocket.getPersistentDataContainer();
+		final PersistentDataContainer pocketContainer = pocket.getPersistentDataContainer();
 		pocketContainer.set(pocketOwnerKey, DataType.UUID, player.getUniqueId());
 
 		generateIsland(pocket);
