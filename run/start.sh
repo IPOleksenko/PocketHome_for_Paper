@@ -8,24 +8,21 @@ else
 fi
 cd "$(dirname "$0")" || exit 0
 
-plugin_wildcard="PocketHome-*[0-9].jar"
-
 version=1.19.3
-build=386
-file=paper-${version}-${build}.jar
-API_URI=https://api.papermc.io/v2/projects/paper/versions/${version}/builds/${build}/downloads/${file}
+api=https://api.papermc.io/v2/
+plugin_version="$(git --no-pager describe --always)"
 
-if [ ! -f $file ]; then
-  wget $API_URI
+if [ ! -f "server.jar" ]; then
+	latest_build="$(curl -sX GET "$api"/projects/paper/versions/"$version"/builds -H 'accept: application/json' | jq '.builds [-1].build')"
+	download_url="$api"/projects/paper/versions/"$version"/builds/"$latest_build"/downloads/paper-"$version"-"$latest_build".jar
+  if ! wget "$download_url" -O server.jar; then
+  	exit 0
+	fi
 fi
 
-if test -n "$(find plugins/ -maxdepth 1 -name "$plugin_wildcard" -print -quit)"; then
-  rm plugins/$plugin_wildcard
-fi
 
-if test -n "$(find ../build/libs/ -maxdepth 1 -name "$plugin_wildcard" -print -quit)"; then
-  cp "$(find ../build/libs/ -name "${plugin_wildcard}" -print0 | xargs -r -0 ls -1 -t | head -1)" plugins/
-fi
+rm plugins/PocketHome-*
+cp "../build/libs/PocketHome-$plugin_version.jar" plugins/
 
 java \
   -Xms4G -Xmx4G -Djava.net.preferIPv4Stack=true --add-modules=jdk.incubator.vector -XX:+UseG1GC \
@@ -35,4 +32,4 @@ java \
   -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 \
   -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1 \
   -Dusing.aikars.flags=https://mcflags.emc.gs -Daikars.new.flags=true \
-  -jar $file nogui
+  -jar server.jar nogui
