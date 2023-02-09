@@ -12,8 +12,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.nio.ByteBuffer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Manager for pocket worlds
@@ -201,7 +203,7 @@ public class PocketManager {
 	public List<World> getGuestPockets(@NotNull Player player) {
 		final PersistentDataContainer playerContainer = player.getPersistentDataContainer();
 		final List<UUID> guestPocketsUID = playerContainer.get(pocketGuestsKey, DataType.UUID_LIST);
-		if (guestPocketsUID == null) return new ArrayList<World>();
+		if (guestPocketsUID == null) return new ArrayList<>();
 
 		return guestPocketsUID.stream().map(Bukkit::getWorld).toList();
 	}
@@ -226,7 +228,7 @@ public class PocketManager {
 	public List<OfflinePlayer> getPocketGuests(@NotNull World pocket) {
 		final PersistentDataContainer pocketContainer = pocket.getPersistentDataContainer();
 		final List<UUID> pocketGuestsUID = pocketContainer.get(pocketGuestsKey, DataType.UUID_LIST);
-		if (pocketGuestsUID == null) return new ArrayList<OfflinePlayer>();
+		if (pocketGuestsUID == null) return new ArrayList<>();
 
 		return pocketGuestsUID.stream().map(Bukkit::getOfflinePlayer).toList();
 	}
@@ -246,7 +248,7 @@ public class PocketManager {
 
 	private void addGuest(@NotNull PersistentDataContainer container, UUID uuid) {
 		List<UUID> guests = container.get(pocketGuestsKey, DataType.UUID_LIST);
-		if (guests == null) guests = new ArrayList<UUID>();
+		if (guests == null) guests = new ArrayList<>();
 		if (guests.contains(uuid)) return;
 
 		guests.add(uuid);

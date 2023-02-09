@@ -45,6 +45,6 @@ public class UUIDListDataType implements PersistentDataType<int[], List> {
 		for (int i = 0; i < primitive.length / 4; ++i)
 			System.arraycopy(primitive, i * 4, ints[i], 0, 4);
 
-		return new LinkedList<UUID>(Arrays.stream(ints).map(UUIDDataType::fromInts).toList());
+		return new LinkedList<>(Arrays.stream(ints).map(UUIDDataType::fromInts).toList());
 	}
 }
