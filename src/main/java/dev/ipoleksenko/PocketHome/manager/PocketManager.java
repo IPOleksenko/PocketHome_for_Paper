@@ -12,9 +12,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -289,11 +287,12 @@ public class PocketManager {
 	}
 
 	private void generateMisc(@NotNull World pocket) {
+		pocket.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
 		pocket.getBlockAt(0, 1, 0).setType(Material.ENDER_CHEST);
 
 		WorldBorder border = pocket.getWorldBorder();
 		border.setCenter(0., 0.);
-		border.setSize(2 * PocketHomePlugin.getPocketRadius() * 16);
+		border.setSize(2 * (PocketHomePlugin.getPocketRadius() + 1) * 16);
 		border.setWarningDistance(0);
 	}
 }
