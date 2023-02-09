@@ -7,6 +7,7 @@ import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,14 +22,14 @@ import java.util.UUID;
  * Manager for pocket worlds
  * <p/>
  * Keys:<br/>
- * pockethome:pocket — UUID of Pocket inside Player<br/>
+ * pockethome:pocket — Name of Pocket inside Player<br/>
  * pockethome:pocket_owner — UUID of Player inside Pocket<br/>
  * pockethome:pocket_guests — List<UUID> of Pockets inside Player, of Players inside Pocket<br/>
  * pockethome:teleport_location — Location of Player inside Player<br/>
  */
 public class PocketManager {
 
-	private final NamespacedKey pocketUIDKey;
+	private final NamespacedKey pocketKey;
 	private final NamespacedKey pocketOwnerKey;
 	private final NamespacedKey pocketGuestsKey;
 	private final NamespacedKey teleportLocationKey;
@@ -37,14 +38,12 @@ public class PocketManager {
 
 
 	public PocketManager() {
-		this.pocketUIDKey = NamespacedKey.fromString("pocket", PocketHomePlugin.getInstance());
+		this.pocketKey = NamespacedKey.fromString("pocket", PocketHomePlugin.getInstance());
 		this.pocketOwnerKey = NamespacedKey.fromString("pocket_owner", PocketHomePlugin.getInstance());
 		this.pocketGuestsKey = NamespacedKey.fromString("pocket_guests", PocketHomePlugin.getInstance());
 		this.teleportLocationKey = NamespacedKey.fromString("teleport_location", PocketHomePlugin.getInstance());
 
 		this.pocketGenerator = new PocketChunkGenerator();
-
-		this.loadPocketWorlds();
 	}
 
 
@@ -266,16 +265,11 @@ public class PocketManager {
 	@Nullable
 	private World getPocket(@NotNull Player player, boolean createIfMissing) {
 		final PersistentDataContainer playerContainer = player.getPersistentDataContainer();
-		final UUID pocketUID = playerContainer.get(pocketUIDKey, DataType.UUID);
+		final String pocketName = playerContainer.get(pocketKey, PersistentDataType.STRING);
 
-		if (pocketUID == null && createIfMissing) return this.createPocket(player);
-		if (pocketUID == null) return null;
+		if (pocketName == null) return createIfMissing ? this.createPocket(player) : null;
 
-		final World pocket = Bukkit.getWorld(pocketUID);
-
-		if (pocket == null && createIfMissing) return this.createPocket(player);
-
-		return pocket;
+		return Bukkit.getWorld(pocketName);
 	}
 
 	private @NotNull World createPocket(@NotNull Player player) {
@@ -283,7 +277,7 @@ public class PocketManager {
 		final World pocket = this.getPocketCreator(pocketName).createWorld();
 
 		final PersistentDataContainer playerContainer = player.getPersistentDataContainer();
-		playerContainer.set(pocketUIDKey, DataType.UUID, pocket.getUID());
+		playerContainer.set(pocketKey, PersistentDataType.STRING, pocket.getName());
 
 		final PersistentDataContainer pocketContainer = pocket.getPersistentDataContainer();
 		pocketContainer.set(pocketOwnerKey, DataType.UUID, player.getUniqueId());
@@ -301,23 +295,5 @@ public class PocketManager {
 		border.setCenter(0., 0.);
 		border.setSize(2 * PocketHomePlugin.getPocketRadius() * 16);
 		border.setWarningDistance(0);
-	}
-
-	/**
-	 * Preload (re-create) pocket worlds to be able to teleport into it
-	 */
-	private void loadPocketWorlds() {
-		File dir = new File(PocketHomePlugin.getPocketsDir());
-		if (!dir.exists()) return;
-
-		File[] pocketDirs = dir.listFiles();
-		if (pocketDirs == null) return;
-
-		for (File pocketDir : pocketDirs)
-			if (pocketDir.isDirectory()) {
-				String[] pocketFiles = pocketDir.list();
-				if (pocketFiles != null && Arrays.asList(pocketFiles).contains("level.dat"))
-					this.getPocketCreator(pocketDir.getName()).createWorld();
-			}
 	}
 }
