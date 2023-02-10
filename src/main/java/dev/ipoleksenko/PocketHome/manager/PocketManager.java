@@ -1,6 +1,7 @@
 package dev.ipoleksenko.PocketHome.manager;
 
 import dev.ipoleksenko.PocketHome.PocketHomePlugin;
+import dev.ipoleksenko.PocketHome.generator.LinkerChunkGenerator;
 import dev.ipoleksenko.PocketHome.generator.PocketChunkGenerator;
 import dev.ipoleksenko.PocketHome.util.DataType;
 import org.bukkit.*;
@@ -12,9 +13,8 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.nio.ByteBuffer;
+import java.util.*;
 
 /**
  * Manager for pocket worlds
@@ -24,6 +24,7 @@ import java.util.UUID;
  * pockethome:pocket_owner — UUID of Player inside Pocket<br/>
  * pockethome:pocket_guests — List<UUID> of Pockets inside Player, of Players inside Pocket<br/>
  * pockethome:teleport_location — Location of Player inside Player<br/>
+ * pockethome:linked_pocket — UUID of Linker inside Player and Pocket, List<UUID> of Pockets inside Linker
  */
 public class PocketManager {
 
@@ -31,8 +32,10 @@ public class PocketManager {
 	private final NamespacedKey pocketOwnerKey;
 	private final NamespacedKey pocketGuestsKey;
 	private final NamespacedKey teleportLocationKey;
+	private final NamespacedKey linkedPocketKey;
 
 	private final PocketChunkGenerator pocketGenerator;
+	private final LinkerChunkGenerator linkerGenerator;
 
 
 	public PocketManager() {
@@ -40,10 +43,36 @@ public class PocketManager {
 		this.pocketOwnerKey = NamespacedKey.fromString("pocket_owner", PocketHomePlugin.getInstance());
 		this.pocketGuestsKey = NamespacedKey.fromString("pocket_guests", PocketHomePlugin.getInstance());
 		this.teleportLocationKey = NamespacedKey.fromString("teleport_location", PocketHomePlugin.getInstance());
+		this.linkedPocketKey = NamespacedKey.fromString("linked_pocket", PocketHomePlugin.getInstance());
 
 		this.pocketGenerator = new PocketChunkGenerator();
+		this.linkerGenerator = new LinkerChunkGenerator();
 	}
 
+
+	private @NotNull String getUniqueId() {
+		final Base64.Encoder encoder = Base64.getUrlEncoder();
+		final ByteBuffer bb = ByteBuffer.wrap(new byte[8]);
+		final UUID uuid = UUID.randomUUID();
+
+		bb.putLong(uuid.getLeastSignificantBits());
+		final byte[] bytes = bb.array();
+
+		return "__lnk" + encoder.encodeToString(bytes).replace("=", "").toLowerCase();
+	}
+
+	private @NotNull Integer getChunksAtLevel(Integer level) {
+		if (level == 0) return 0;
+		return 4 * level + this.getChunksAtLevel(level - 1);
+	}
+
+	private @NotNull Integer getLevelAtChunks(Integer chunks) {
+		int level;
+		for (level = 0; level < chunks; ++level)
+			if (this.getChunksAtLevel(level) >= chunks) break;
+
+		return level;
+	}
 
 	/**
 	 * Used for saving Pocket in separate folder
@@ -56,12 +85,29 @@ public class PocketManager {
 		return PocketHomePlugin.getPocketsDir() + pocketName;
 	}
 
+	private @NotNull String getLinkedPath(String linkerName) {
+		return this.getPocketPath(linkerName);
+	}
+
+	private ChunkGenerator getLinkerGenerator() {
+		return this.linkerGenerator;
+	}
+
 	private ChunkGenerator getPocketGenerator() {
 		return this.pocketGenerator;
 	}
 
 	private @NotNull WorldCreator getWorldCreator(String name) {
 		return new WorldCreator(name).environment(World.Environment.NORMAL);
+	}
+
+	/**
+	 * Get WorldCreator for Linker worlds
+	 *
+	 * @return WorldCreator for a Linker worlds object
+	 */
+	private @NotNull WorldCreator getLinkerCreator(String linkerName) {
+		return this.getWorldCreator(this.getLinkedPath(linkerName)).generator(this.getLinkerGenerator());
 	}
 
 	/**
@@ -85,6 +131,16 @@ public class PocketManager {
 		return player.getWorld().getName().contains(PocketHomePlugin.getPocketsDir());
 	}
 
+	public boolean isLinked(@NotNull Player player) {
+		final PersistentDataContainer playerContainer = player.getPersistentDataContainer();
+		return playerContainer.has(linkedPocketKey);
+	}
+
+	public void loadPockets(Player @NotNull ... players) {
+		for (Player player : players)
+			this.createPocket(player);
+	}
+
 	/**
 	 * Teleports player to his Pocket
 	 *
@@ -103,7 +159,7 @@ public class PocketManager {
 	 * @return true on successful teleport, false if pocket does not exist
 	 */
 	public boolean teleportToPocket(@NotNull Player player, @NotNull Player otherPlayer) {
-		final World pocket = this.getPocket(otherPlayer, player == otherPlayer);
+		final World pocket = this.isLinked(player) ? this.getLinker(player) : this.getPocket(otherPlayer, player == otherPlayer);
 		if (pocket == null) return false;
 
 		return this.teleportToPocket(player, pocket);
@@ -200,7 +256,7 @@ public class PocketManager {
 	public List<World> getGuestPockets(@NotNull Player player) {
 		final PersistentDataContainer playerContainer = player.getPersistentDataContainer();
 		final List<String> guestPockets = playerContainer.get(pocketGuestsKey, DataType.STRING_LIST);
-		if (guestPockets == null) return new ArrayList<>();
+		if (guestPockets == null) return new LinkedList<>();
 
 		return guestPockets.stream().map(Bukkit::getWorld).toList();
 	}
@@ -225,7 +281,7 @@ public class PocketManager {
 	public List<OfflinePlayer> getPocketGuests(@NotNull World pocket) {
 		final PersistentDataContainer pocketContainer = pocket.getPersistentDataContainer();
 		final List<UUID> pocketGuestsUID = pocketContainer.get(pocketGuestsKey, DataType.UUID_LIST);
-		if (pocketGuestsUID == null) return new ArrayList<>();
+		if (pocketGuestsUID == null) return new LinkedList<>();
 
 		return pocketGuestsUID.stream().map(Bukkit::getOfflinePlayer).toList();
 	}
@@ -243,9 +299,34 @@ public class PocketManager {
 		return Bukkit.getOfflinePlayer(ownerUID);
 	}
 
+	public boolean linkPockets(@NotNull Player player, @NotNull Player otherPlayer) {
+		if (this.isLinked(player) && this.isLinked(otherPlayer)) return false;
+
+		final World pocket = this.getPocket(player, false);
+		final World otherPocket = this.getPocket(otherPlayer, false);
+		if (pocket == null || otherPocket == null) return false;
+
+		this.reloadPockets(pocket, otherPocket);
+
+		World linker = this.getLinker(player);
+		if (linker == null) linker = this.getLinker(otherPlayer);
+		if (linker == null) linker = this.createLinker(player, otherPlayer);
+
+		this.syncChunks(linker, false);
+
+		return true;
+	}
+
+	public boolean unlinkPockets(@NotNull Player player) {
+		if (!this.isLinked(player)) return false;
+		if (this.getLinker(player) == player.getWorld()) this.teleportFromPocket(player);
+		this.deleteLinker(player);
+		return true;
+	}
+
 	private <T, Z> void addGuest(@NotNull PersistentDataContainer container, PersistentDataType<Z, List> dataType, T data) {
 		List<T> guests = container.get(pocketGuestsKey, dataType);
-		if (guests == null) guests = new ArrayList<>();
+		if (guests == null) guests = new LinkedList<>();
 		if (guests.contains(data)) return;
 
 		guests.add(data);
@@ -254,7 +335,7 @@ public class PocketManager {
 
 	private <T, Z> void removeGuest(@NotNull PersistentDataContainer container, PersistentDataType<Z, List> type, T data) {
 		List<T> guests = container.get(pocketGuestsKey, type);
-		if (guests == null) guests = new ArrayList<>();
+		if (guests == null) guests = new LinkedList<>();
 
 		guests.remove(data);
 		container.set(pocketGuestsKey, type, guests);
@@ -267,7 +348,7 @@ public class PocketManager {
 
 		if (pocketName == null) return createIfMissing ? this.createPocket(player) : null;
 
-		return Bukkit.getWorld(pocketName);
+		return Bukkit.getWorld(this.getPocketPath(pocketName));
 	}
 
 	private @NotNull World createPocket(@NotNull Player player) {
@@ -275,7 +356,7 @@ public class PocketManager {
 		final World pocket = this.getPocketCreator(pocketName).createWorld();
 
 		final PersistentDataContainer playerContainer = player.getPersistentDataContainer();
-		playerContainer.set(pocketKey, PersistentDataType.STRING, pocket.getName());
+		playerContainer.set(pocketKey, PersistentDataType.STRING, pocket.getName().split("/")[1]);
 
 		final PersistentDataContainer pocketContainer = pocket.getPersistentDataContainer();
 		pocketContainer.set(pocketOwnerKey, DataType.UUID, player.getUniqueId());
@@ -286,13 +367,131 @@ public class PocketManager {
 		return pocket;
 	}
 
+	private void unloadPockets(World @NotNull ... pockets) {
+		for (World pocket : pockets) {
+			for (Player player : pocket.getPlayers())
+				this.teleportFromPocket(player);
+			Bukkit.unloadWorld(pocket, true);
+		}
+	}
+
+	private void reloadPockets(World @NotNull ... pockets) {
+		this.unloadPockets(pockets);
+		final Player[] players = Arrays.stream(pockets).map(this::getPocketOwner).filter(OfflinePlayer::isOnline).map(OfflinePlayer::getPlayer).toArray(Player[]::new);
+		this.loadPockets(players);
+	}
+
+	private @Nullable World getLinker(@NotNull Player player) {
+		final PersistentDataContainer playerContainer = player.getPersistentDataContainer();
+		final String linkerName = playerContainer.get(linkedPocketKey, PersistentDataType.STRING);
+		if (linkerName == null) return null;
+
+		World linker = Bukkit.getWorld(getPocketPath(linkerName));
+		if (linker == null) linker = this.createLinker(player, player, linkerName);
+
+		this.syncChunks(linker, true);
+
+		return linker;
+	}
+
+	private void syncChunks(@NotNull World linker, boolean savePockets) {
+		final PersistentDataContainer linkerContainer = linker.getPersistentDataContainer();
+		List<String> linkerPockets = linkerContainer.get(linkedPocketKey, DataType.STRING_LIST);
+		if (linkerPockets == null) linkerPockets = new LinkedList<>();
+
+		final int radius = PocketHomePlugin.getPocketRadius();
+		final int linkerLevels = this.getLevelAtChunks(linkerPockets.size());
+
+		final Iterator<World> pocketWorlds = linkerPockets.stream().map(this::getLinkedPath).map(Bukkit::getWorld).iterator();
+		for (int level = 1; level <= linkerLevels; ++level) {
+			final int max = level * radius * 2;
+			for (int linkerChunkX = -max; linkerChunkX <= max; linkerChunkX += 4 * radius)
+				for (int linkerChunkZ = -max; linkerChunkZ <= max; linkerChunkZ += 4 * radius) {
+					if (Math.abs(linkerChunkX) != max && Math.abs(linkerChunkZ) != max) continue;
+
+					if (!pocketWorlds.hasNext()) break;
+					final World pocket = pocketWorlds.next();
+					for (int pocketChunkX = -radius; pocketChunkX < radius; ++pocketChunkX)
+						for (int pocketChunkZ = -radius; pocketChunkZ < radius; ++pocketChunkZ) {
+							final int toChunkX = linkerChunkX + pocketChunkX;
+							final int toChunkZ = linkerChunkZ + pocketChunkZ;
+							if (savePockets) {
+								final Chunk pocketChunk = pocket.getChunkAt(pocketChunkX, pocketChunkZ);
+								final ChunkSnapshot linkerChunkSnapshot = linker.getChunkAt(toChunkX, toChunkZ).getChunkSnapshot();
+								Bukkit.getScheduler().runTask(PocketHomePlugin.getInstance(), () -> this.copyChunk(linkerChunkSnapshot, pocketChunk));
+							} else {
+								final ChunkSnapshot pocketChunkSnapshot = pocket.getChunkAt(pocketChunkX, pocketChunkZ).getChunkSnapshot();
+								final Chunk linkerChunk = linker.getChunkAt(toChunkX, toChunkZ);
+								Bukkit.getScheduler().runTask(PocketHomePlugin.getInstance(), () -> this.copyChunk(pocketChunkSnapshot, linkerChunk));
+							}
+						}
+				}
+		}
+	}
+
+	private void copyChunk(ChunkSnapshot from, Chunk to) {
+		for (int x = 0; x < 16; ++x)
+			for (int y = -64; y < 320; ++y)
+				for (int z = 0; z < 16; ++z) {
+					to.getBlock(x, y, z).setType(from.getBlockType(x, y, z));
+					to.getBlock(x, y, z).setBlockData(from.getBlockData(x, y, z));
+				}
+	}
+
+	private @NotNull World createLinker(Player player, Player otherPlayer) {
+		return this.createLinker(player, otherPlayer, this.getUniqueId());
+	}
+
+	private @NotNull World createLinker(@NotNull Player player, @NotNull Player otherPlayer, String linkerName) {
+		final World linker = this.getLinkerCreator(linkerName).createWorld();
+		PocketHomePlugin.getInstance().getLogger().info("Created linker: " + linker.getName());
+
+		final PersistentDataContainer playerContainer = player.getPersistentDataContainer();
+		final PersistentDataContainer otherPlayerContainer = otherPlayer.getPersistentDataContainer();
+		final PersistentDataContainer linkerContainer = linker.getPersistentDataContainer();
+
+		playerContainer.set(linkedPocketKey, PersistentDataType.STRING, linker.getName().split("/")[1]);
+		otherPlayerContainer.set(linkedPocketKey, PersistentDataType.STRING, linker.getName().split("/")[1]);
+
+		List<String> linkedPockets = linkerContainer.get(linkedPocketKey, DataType.STRING_LIST);
+		if (linkedPockets == null) linkedPockets = new LinkedList<>();
+
+		String pocketName = playerContainer.get(pocketKey, PersistentDataType.STRING);
+		if (!linkedPockets.contains(pocketName)) linkedPockets.add(pocketName);
+		pocketName = otherPlayerContainer.get(pocketKey, PersistentDataType.STRING);
+		if (!linkedPockets.contains(pocketName)) linkedPockets.add(pocketName);
+
+		linkerContainer.set(linkedPocketKey, DataType.STRING_LIST, linkedPockets);
+
+		linker.getBlockAt(7, 1, 9).setType(Material.ENDER_CHEST);
+		linker.setSpawnLocation(8, 1, 8);
+
+		return linker;
+	}
+
+	private void deleteLinker(@NotNull Player player) {
+		final World linker = this.getLinker(player);
+
+		final PersistentDataContainer playerContainer = player.getPersistentDataContainer();
+		final PersistentDataContainer linkerContainer = linker.getPersistentDataContainer();
+
+		playerContainer.remove(linkedPocketKey);
+
+		List<String> linkedPockets = linkerContainer.get(linkedPocketKey, DataType.STRING_LIST);
+		if (linkedPockets == null) linkedPockets = new LinkedList<>();
+
+		String pocketName = playerContainer.get(pocketKey, PersistentDataType.STRING);
+		linkedPockets.remove(pocketName);
+		linkerContainer.set(linkedPocketKey, DataType.STRING_LIST, linkedPockets);
+	}
+
 	private void generateMisc(@NotNull World pocket) {
 		pocket.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
 		pocket.getBlockAt(0, 1, 0).setType(Material.ENDER_CHEST);
 
 		WorldBorder border = pocket.getWorldBorder();
 		border.setCenter(0., 0.);
-		border.setSize(2 * (PocketHomePlugin.getPocketRadius() + 1) * 16);
+		border.setSize(2 * PocketHomePlugin.getPocketRadius() * 16);
 		border.setWarningDistance(0);
 	}
 }
