@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class DamageListener implements Listener {
 
+
     @EventHandler
     public void onDamageVoid(@NotNull EntityDamageEvent event) {
         if (event.getCause() == EntityDamageEvent.DamageCause.VOID) {

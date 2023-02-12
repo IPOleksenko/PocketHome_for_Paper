@@ -142,7 +142,7 @@ public class PocketManager {
 
 		WorldBorder border = pocket.getWorldBorder();
 		border.setCenter(0., 0.);
-		border.setSize(64);
+		border.setSize(80);
 		border.setWarningDistance(0);
 	}
 }

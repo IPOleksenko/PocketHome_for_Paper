@@ -1,5 +1,6 @@
 package dev.ipoleksenko.PocketHome;
 
+import dev.ipoleksenko.PocketHome.GUI.GUI;
 import dev.ipoleksenko.PocketHome.generator.PocketChunkGenerator;
 import dev.ipoleksenko.PocketHome.listener.DamageListener;
 import dev.ipoleksenko.PocketHome.listener.EnderChestListener;
@@ -33,6 +34,7 @@ public class PocketHomePlugin extends JavaPlugin {
     getServer().getPluginManager().registerEvents(new EnderChestListener(), this);
     getServer().getPluginManager().registerEvents(new PlayerListener(), this);
     getServer().getPluginManager().registerEvents(new DamageListener(), this);
+    getServer().getPluginManager().registerEvents(new GUI(), this);
   }
 
   private void loadPocketWorlds() {

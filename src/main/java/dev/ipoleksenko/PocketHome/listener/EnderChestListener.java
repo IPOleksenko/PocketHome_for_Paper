@@ -19,13 +19,9 @@ public class EnderChestListener implements Listener {
             Block blockEvent = event.getClickedBlock();
             if (blockEvent.getType() == Material.ENDER_CHEST) {
                 if (player.isSneaking()) {
-                    if (!PocketHomePlugin.getInstance().getPocketManager().isInPocket(player)) {
-                        player.sendMessage("Teleport to HOME...");
-                        PocketHomePlugin.getInstance().getPocketManager().teleportToPocket(player);
-                    }
-                    else{
-                        PocketHomePlugin.getInstance().getPocketManager().teleportFromPocket(player);
-                    }
+                    GUI gui = new GUI();
+                    event.setCancelled(true);
+                    gui.OpenGUI(player);
                 }
             }
         }
