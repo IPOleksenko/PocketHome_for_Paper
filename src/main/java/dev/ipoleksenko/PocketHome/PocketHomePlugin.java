@@ -1,5 +1,6 @@
 package dev.ipoleksenko.PocketHome;
 
+import dev.ipoleksenko.PocketHome.listener.PlayerListener;
 import dev.ipoleksenko.PocketHome.manager.LinkerManager;
 import dev.ipoleksenko.PocketHome.manager.PocketManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -62,6 +63,8 @@ public class PocketHomePlugin extends JavaPlugin {
 		instance = this;
 		this.pocketManager = new PocketManager();
 		this.linkerManager = new LinkerManager();
+
+		getServer().getPluginManager().registerEvents(new PlayerListener(), this);
 	}
 
 	@Override
