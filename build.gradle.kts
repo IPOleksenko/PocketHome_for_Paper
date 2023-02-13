@@ -1,43 +1,57 @@
+import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
+
 import java.io.ByteArrayOutputStream
 
 plugins {
-	id("java")
+	`java-library`
+	id("io.papermc.paperweight.userdev") version "1.5.0"
+	id("xyz.jpenilla.run-paper") version "2.0.1"
+	id("net.minecrell.plugin-yml.bukkit") version "0.5.2"
 }
 
 group = "dev.ipoleksenko"
-version = "git --no-pager describe --always".runCommand()
-
-repositories {
-	mavenCentral()
-	maven("https://repo.papermc.io/repository/maven-public/")
-}
-
-dependencies {
-	compileOnly("io.papermc.paper:paper-api:${project.properties["paper_version"]}")
-}
+version = "git --no-pager describe --always".runCommand() + getVersionMetadata()
+description = "A pocket dimension plugin"
 
 java {
 	toolchain.languageVersion.set(JavaLanguageVersion.of(17))
 	withSourcesJar()
 }
 
+dependencies {
+	paperweight.paperDevBundle("1.19.3-R0.1-SNAPSHOT")
+}
+
+
 tasks {
-	processResources {
-		val props = linkedMapOf("version" to version, "api_version" to project.properties["paper_api_version"])
-		inputs.properties(props)
-		filesMatching("plugin.yml") {
-			expand(props)
-		}
-		version = getVersionMetadata()
+	assemble {
+		dependsOn(reobfJar)
 	}
+
+	compileJava {
+		options.encoding = Charsets.UTF_8.name()
+		options.release.set(17)
+	}
+	javadoc {
+		options.encoding = Charsets.UTF_8.name() // We want UTF-8 for everything
+	}
+	processResources {
+		filteringCharset = Charsets.UTF_8.name() // We want UTF-8 for everything
+	}
+}
+
+bukkit {
+	main = "dev.ipoleksenko.PocketHome.PocketHomePlugin"
+	load = BukkitPluginDescription.PluginLoadOrder.POSTWORLD
+	authors = listOf("IPOleksenko", "rvbsm")
+	apiVersion = "1.19"
 }
 
 fun getVersionMetadata(): String {
 	val buildId = System.getenv("GITHUB_RUN_NUMBER")
 
-	if (buildId != null)
-		return version.toString() + "+build.${buildId}"
-	return version.toString()
+	if (buildId != null) return "+build.${buildId}"
+	return ""
 }
 
 fun String.runCommand(currentWorkingDir: File = file("./")): String {

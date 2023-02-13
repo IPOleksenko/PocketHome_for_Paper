@@ -1,5 +1,7 @@
 package dev.ipoleksenko.PocketHome;
 
+import dev.ipoleksenko.PocketHome.listener.DamageListener;
+import dev.ipoleksenko.PocketHome.listener.EnderChestListener;
 import dev.ipoleksenko.PocketHome.listener.PlayerListener;
 import dev.ipoleksenko.PocketHome.manager.LinkerManager;
 import dev.ipoleksenko.PocketHome.manager.PocketManager;
@@ -64,7 +66,9 @@ public class PocketHomePlugin extends JavaPlugin {
 		this.pocketManager = new PocketManager();
 		this.linkerManager = new LinkerManager();
 
+		getServer().getPluginManager().registerEvents(new EnderChestListener(), this);
 		getServer().getPluginManager().registerEvents(new PlayerListener(), this);
+		getServer().getPluginManager().registerEvents(new DamageListener(), this);
 	}
 
 	@Override
