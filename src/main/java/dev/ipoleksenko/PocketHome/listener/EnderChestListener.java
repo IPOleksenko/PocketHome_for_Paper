@@ -20,9 +20,9 @@ public class EnderChestListener implements Listener {
 				if (player.isSneaking()) {
 					if (!PocketHomePlugin.getInstance().getPocketManager().isInPocket(player)) {
 						player.sendMessage("Teleport to HOME...");
-						PocketHomePlugin.getInstance().getPocketManager().teleportToPocket(player);
+						PocketHomePlugin.getInstance().getPocketManager().teleportTo(player);
 					} else {
-						PocketHomePlugin.getInstance().getPocketManager().teleportFromPocket(player);
+						PocketHomePlugin.getInstance().getPocketManager().teleportFrom(player);
 					}
 				}
 			}

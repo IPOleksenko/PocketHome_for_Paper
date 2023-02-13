@@ -15,7 +15,7 @@ public class DamageListener implements Listener {
 			Player player = (Player) event.getEntity();
 			if (PocketHomePlugin.getInstance().getPocketManager().isInPocket(player)) {
 				player.setFallDistance(0);
-				PocketHomePlugin.getInstance().getPocketManager().teleportFromPocket(player);
+				PocketHomePlugin.getInstance().getPocketManager().teleportFrom(player);
 				event.setCancelled(true);
 			}
 		}
