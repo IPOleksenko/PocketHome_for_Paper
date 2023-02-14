@@ -77,6 +77,7 @@ public abstract class PluginWorldManager {
 	 * @return true, if the teleport was successful
 	 */
 	public boolean teleportTo(@NotNull Player player) {
+		if (this.isInPocket(player)) return false;
 		return linkerInstance.isLinked(player) ? linkerInstance.teleportToLinker(player) : this.teleportTo(player, player);
 	}
 
@@ -123,6 +124,7 @@ public abstract class PluginWorldManager {
 	 * @return true, if the teleport was successful
 	 */
 	public boolean teleportFrom(@NotNull Player player) {
+		if (!this.isInPocket(player)) return false;
 		final PersistentDataContainer playerContainer = player.getPersistentDataContainer();
 		Location location = playerContainer.get(teleportLocationKey, DataType.LOCATION);
 
