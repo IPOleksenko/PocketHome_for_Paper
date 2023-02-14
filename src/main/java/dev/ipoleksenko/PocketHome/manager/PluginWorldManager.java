@@ -102,16 +102,10 @@ public abstract class PluginWorldManager {
 	public boolean teleportTo(@NotNull Player player, @NotNull World world) {
 		final PersistentDataContainer playerContainer = player.getPersistentDataContainer();
 		final Location spawnLocation = world.getSpawnLocation();
-		if (this.isInPocket(player)) playerContainer.set(teleportLocationKey, DataType.LOCATION, player.getLocation());
-
-		this.getLeashedEntities(playerContainer).stream()
-						.map(Bukkit::getEntity)
-						.filter(Objects::nonNull)
-						.forEach(entity -> entity.teleport(spawnLocation));
-		this.clearLeashedEntity(player);
+		if (!this.isInPocket(player)) playerContainer.set(teleportLocationKey, DataType.LOCATION, player.getLocation());
 
 		player.setInvulnerable(true);
-		return player.teleport(spawnLocation);
+		return this.teleportPlayer(player, spawnLocation);
 	}
 
 	/**
@@ -126,27 +120,30 @@ public abstract class PluginWorldManager {
 	public boolean teleportFrom(@NotNull Player player) {
 		if (!this.isInPocket(player)) return false;
 		final PersistentDataContainer playerContainer = player.getPersistentDataContainer();
-		Location location = playerContainer.get(teleportLocationKey, DataType.LOCATION);
+		Location spawnLocation = playerContainer.get(teleportLocationKey, DataType.LOCATION);
 
-		if (location == null) location = player.getBedSpawnLocation();
-		if (location == null) location = Bukkit.getWorlds().get(0).getSpawnLocation();
+		if (spawnLocation == null) spawnLocation = player.getBedSpawnLocation();
+		if (spawnLocation == null) spawnLocation = Bukkit.getWorlds().get(0).getSpawnLocation();
 
-		final Location entityLocation = location;
+		player.setInvulnerable(false);
+		return this.teleportPlayer(player, spawnLocation);
+	}
+
+	private boolean teleportPlayer(@NotNull Player player, Location spawnLocation) {
+		final PersistentDataContainer playerContainer = player.getPersistentDataContainer();
 		this.getLeashedEntities(playerContainer).stream()
 						.map(Bukkit::getEntity)
 						.filter(Objects::nonNull)
-						.forEach(entity -> entity.teleport(entityLocation));
-		this.clearLeashedEntity(player);
+						.forEach(entity -> entity.teleport(spawnLocation));
 
-		player.setInvulnerable(false);
-		return player.teleport(location);
+		return player.teleport(spawnLocation);
 	}
-
 
 	public @NotNull List<UUID> getLeashedEntities(@NotNull PersistentDataContainer playerContainer) {
 		List<UUID> leashedEntities = playerContainer.get(leashedEntityKey, DataType.UUID_LIST);
 		if (leashedEntities == null) leashedEntities = new LinkedList<>();
 
+		this.clearLeashedEntity(playerContainer);
 		return leashedEntities;
 	}
 
@@ -156,8 +153,6 @@ public abstract class PluginWorldManager {
 		if (!leashedEntities.contains(entityUID)) leashedEntities.add(entityUID);
 
 		playerContainer.set(leashedEntityKey, DataType.UUID_LIST, leashedEntities);
-
-		PocketHomePlugin.getInstance().getLogger().info(leashedEntities.toString());
 	}
 
 	public void removeLeashed(@NotNull PersistentDataContainer playerContainer, @NotNull Entity entity) {
@@ -166,12 +161,9 @@ public abstract class PluginWorldManager {
 		leashedEntities.remove(entityUID);
 
 		playerContainer.set(leashedEntityKey, DataType.UUID_LIST, leashedEntities);
-
-		PocketHomePlugin.getInstance().getLogger().info(leashedEntities.toString());
 	}
 
-	public void clearLeashedEntity(@NotNull Player player) {
-		final PersistentDataContainer playerContainer = player.getPersistentDataContainer();
+	public void clearLeashedEntity(@NotNull PersistentDataContainer playerContainer) {
 		playerContainer.set(leashedEntityKey, DataType.UUID_LIST, new LinkedList<UUID>());
 	}
 

@@ -38,7 +38,6 @@ public class PlayerListener implements Listener {
 		final Player player = event.getPlayer();
 		final PocketManager pocketManager = PocketHomePlugin.getInstance().getPocketManager();
 		if (pocketManager.isInPocket(player)) {
-			pocketManager.clearLeashedEntity(player);
 			pocketManager.teleportFrom(player);
 		}
 	}
