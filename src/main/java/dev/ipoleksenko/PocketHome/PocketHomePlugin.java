@@ -67,11 +67,11 @@ public class PocketHomePlugin extends JavaPlugin {
 		this.pocketManager = new PocketManager();
 		this.linkerManager = new LinkerManager();
 
-    getServer().getPluginManager().registerEvents(new EnderChestListener(), this);
-    getServer().getPluginManager().registerEvents(new PlayerListener(), this);
-    getServer().getPluginManager().registerEvents(new DamageListener(), this);
-    getServer().getPluginManager().registerEvents(new ChestListener(), this);
-  }
+		getServer().getPluginManager().registerEvents(new EnderChestListener(), this);
+		getServer().getPluginManager().registerEvents(new PlayerListener(), this);
+		getServer().getPluginManager().registerEvents(new DamageListener(), this);
+		getServer().getPluginManager().registerEvents(new ChestListener(), this);
+	}
 
 	@Override
 	public void onDisable() {

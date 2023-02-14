@@ -11,19 +11,19 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class EnderChestListener implements Listener {
-    @EventHandler
-    public void action(@NotNull PlayerInteractEvent event) {
-        Player player = event.getPlayer();
-        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+	@EventHandler
+	public void action(@NotNull PlayerInteractEvent event) {
+		Player player = event.getPlayer();
+		if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 
-        Block blockEvent = event.getClickedBlock();
+		Block blockEvent = event.getClickedBlock();
 
-        if (blockEvent.getType() != Material.ENDER_CHEST) return;
+		if (blockEvent.getType() != Material.ENDER_CHEST) return;
 
-        if (!player.isSneaking()) return;
+		if (!player.isSneaking()) return;
 
-        mainGUI main = new mainGUI();
-        event.setCancelled(true);
-        main.OpenGUI(player);
-    }
+		mainGUI main = new mainGUI();
+		event.setCancelled(true);
+		main.OpenGUI(player);
+	}
 }
