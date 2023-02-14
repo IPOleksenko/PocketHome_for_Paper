@@ -34,9 +34,13 @@ public class PlayerListener implements Listener {
 	}
 
 	@EventHandler
-	public void onPlayerDisconnect(@NotNull PlayerQuitEvent event) {
+	public void onDisconnect(@NotNull PlayerQuitEvent event) {
 		final Player player = event.getPlayer();
-		PocketHomePlugin.getInstance().getPocketManager().teleportFrom(player);
+		final PocketManager pocketManager = PocketHomePlugin.getInstance().getPocketManager();
+		if (pocketManager.isInPocket(player)) {
+			pocketManager.clearLeashedEntity(player);
+			pocketManager.teleportFrom(player);
+		}
 	}
 
 	@EventHandler
