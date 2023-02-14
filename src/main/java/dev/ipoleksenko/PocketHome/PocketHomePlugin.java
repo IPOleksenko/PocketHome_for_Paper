@@ -1,6 +1,5 @@
 package dev.ipoleksenko.PocketHome;
 
-import dev.ipoleksenko.PocketHome.generator.PocketChunkGenerator;
 import dev.ipoleksenko.PocketHome.listener.ChestListener;
 import dev.ipoleksenko.PocketHome.listener.DamageListener;
 import dev.ipoleksenko.PocketHome.listener.EnderChestListener;

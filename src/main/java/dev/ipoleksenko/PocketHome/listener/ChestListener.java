@@ -10,14 +10,16 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 public class ChestListener implements Listener {
     mainGUI main = new mainGUI();
     settingsGUI settings = new settingsGUI();
+
     // Check for clicks on items
     @EventHandler
-    public void onInventoryClick(final InventoryClickEvent event) {
-        if(!event.getView().getTitle().equalsIgnoreCase("PocketHome"))
+    public void onInventoryClick(final @NotNull InventoryClickEvent event) {
+        if (!event.getView().getTitle().equalsIgnoreCase("PocketHome"))
             return;
 
         event.setCancelled(true);
@@ -33,10 +35,10 @@ public class ChestListener implements Listener {
         if(event.getCurrentItem().getType() == Material.RED_BED)
             if (!PocketHomePlugin.getInstance().getPocketManager().isInPocket(player)) {
                 player.sendMessage("Teleport to HOME...");
-                PocketHomePlugin.getInstance().getPocketManager().teleportToPocket(player);
+                PocketHomePlugin.getInstance().getPocketManager().teleportTo(player);
             } else {
                 player.sendMessage("Teleport from HOME...");
-                PocketHomePlugin.getInstance().getPocketManager().teleportFromPocket(player);
+                PocketHomePlugin.getInstance().getPocketManager().teleportFrom(player);
             }
         else if(event.getCurrentItem().getType() == Material.ACACIA_DOOR)
             player.sendMessage("ACACIA_DOOR");
@@ -55,7 +57,7 @@ public class ChestListener implements Listener {
 
     // Cancel dragging in our inventory
     @EventHandler
-    public void onInventoryClick(final InventoryDragEvent event) {
+    public void onInventoryClick(final @NotNull InventoryDragEvent event) {
         if (event.getInventory().equals(main.main)) {
             event.setCancelled(true);
         }

@@ -14,7 +14,7 @@ public class PlayerListener implements Listener {
 	@EventHandler
 	public void join(@NotNull PlayerJoinEvent event) {
 		Player player = event.getPlayer();
-		PocketHomePlugin.getInstance().getPocketManager().teleportToPocket(player);
+		PocketHomePlugin.getInstance().getPocketManager().teleportTo(player);
 		if (!player.hasPlayedBefore()) {
 			player.sendMessage(format("""
 							Hello, %s.    
