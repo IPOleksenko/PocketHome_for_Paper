@@ -12,7 +12,7 @@ if (-not(Test-Path -Path $file)) {
   Invoke-WebRequest -Uri $API_URI -OutFile $file
 }
 
-if (Test-Path -Path "./plugins/PocketHome-*[0-9].jar") {
+if (Test-Path -Path "../plugins/PocketHome-*[0-9].jar") {
   Remove-Item "./plugins/PocketHome-*[0-9].jar"
 }
 
