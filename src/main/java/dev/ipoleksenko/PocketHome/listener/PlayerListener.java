@@ -16,7 +16,7 @@ public class PlayerListener implements Listener {
 		PocketHomePlugin.getInstance().getPocketManager().teleportToPocket(player);
 		if (!player.hasPlayedBefore()) {
 			player.sendMessage(format("""
-							Hello, %s.     
+							Hello, %s.    
 							I'm a PocketHome.
 							You can open my menu by clicking on the ender chest while sneaking.
 							""", player.getName()));
