@@ -3,6 +3,7 @@ package dev.ipoleksenko.PocketHome.manager;
 import dev.ipoleksenko.PocketHome.PocketHomePlugin;
 import dev.ipoleksenko.PocketHome.util.DataType;
 import org.bukkit.*;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.jetbrains.annotations.Contract;
@@ -10,6 +11,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.nio.ByteBuffer;
 import java.util.Base64;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
 
 public abstract class PluginWorldManager {
@@ -21,6 +24,7 @@ public abstract class PluginWorldManager {
 	protected final NamespacedKey pocketGuestsKey;
 	protected final NamespacedKey teleportLocationKey;
 	protected final NamespacedKey linkedPocketKey;
+	private final NamespacedKey leashedEntityKey;
 
 
 	public PluginWorldManager() {
@@ -29,6 +33,7 @@ public abstract class PluginWorldManager {
 		this.pocketGuestsKey = NamespacedKey.fromString("pocket_guests", PocketHomePlugin.getInstance());
 		this.teleportLocationKey = NamespacedKey.fromString("teleport_location", PocketHomePlugin.getInstance());
 		this.linkedPocketKey = NamespacedKey.fromString("linked_pocket", PocketHomePlugin.getInstance());
+		this.leashedEntityKey = NamespacedKey.fromString("leashed_entity", PocketHomePlugin.getInstance());
 	}
 
 	protected @NotNull String getUniqueId(String prefix) {
@@ -97,13 +102,16 @@ public abstract class PluginWorldManager {
 	 * @return true, if the teleport was successful
 	 */
 	public boolean teleportTo(@NotNull Player player, @NotNull World world) {
-		if (this.isInPocket(player)) {
-			final PersistentDataContainer playerContainer = player.getPersistentDataContainer();
+		final PersistentDataContainer playerContainer = player.getPersistentDataContainer();
+		final Location spawnLocation = world.getSpawnLocation();
+		if (this.isInPocket(player))
 			playerContainer.set(teleportLocationKey, DataType.LOCATION, player.getLocation());
-		}
+
+		final List<Entity> leashedEntities = this.getLeashedEntities(playerContainer).stream().map(Bukkit::getEntity).toList();
+		leashedEntities.forEach(entity -> entity.teleport(spawnLocation));
 
 		player.setInvulnerable(true);
-		return player.teleport(world.getSpawnLocation());
+		return player.teleport(spawnLocation);
 	}
 
 	/**
@@ -122,8 +130,46 @@ public abstract class PluginWorldManager {
 		if (location == null) location = player.getBedSpawnLocation();
 		if (location == null) location = Bukkit.getWorlds().get(0).getSpawnLocation();
 
+		final List<Entity> leashedEntities = this.getLeashedEntities(playerContainer).stream().map(Bukkit::getEntity).toList();
+		final Location entityLocation = location;
+		leashedEntities.forEach(entity -> entity.teleport(entityLocation));
+
 		player.setInvulnerable(false);
 		return player.teleport(location);
+	}
+
+
+	public @NotNull List<UUID> getLeashedEntities(@NotNull PersistentDataContainer playerContainer) {
+		List<UUID> leashedEntities = playerContainer.get(leashedEntityKey, DataType.UUID_LIST);
+		if (leashedEntities == null) leashedEntities = new LinkedList<>();
+
+		return leashedEntities;
+	}
+
+	public void addLeashed(@NotNull PersistentDataContainer playerContainer, @NotNull Entity entity) {
+		final List<UUID> leashedEntities = this.getLeashedEntities(playerContainer);
+		final UUID entityUID = entity.getUniqueId();
+		leashedEntities.add(entityUID);
+
+		playerContainer.set(leashedEntityKey, DataType.UUID_LIST, leashedEntities);
+
+		PocketHomePlugin.getInstance().getLogger().info(leashedEntities.toString());
+	}
+
+	public void removeLeashed(@NotNull PersistentDataContainer playerContainer, @NotNull Entity entity) {
+		final List<UUID> leashedEntities = this.getLeashedEntities(playerContainer);
+		final UUID entityUID = entity.getUniqueId();
+		leashedEntities.remove(entityUID);
+
+		playerContainer.set(leashedEntityKey, DataType.UUID_LIST, leashedEntities);
+
+		PocketHomePlugin.getInstance().getLogger().info(leashedEntities.toString());
+
+	}
+
+	public void clearLeashedEntity(@NotNull Player player) {
+		final PersistentDataContainer playerContainer = player.getPersistentDataContainer();
+		playerContainer.set(leashedEntityKey, DataType.UUID_LIST, new LinkedList<UUID>());
 	}
 
 }
