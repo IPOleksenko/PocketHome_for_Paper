@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Provides minecraft:the_void biomes for all pocket worlds
  */
-public class PocketBiomeProvider extends BiomeProvider {
+public class VoidBiomeProvider extends BiomeProvider {
 
 	@Override
 	@NotNull

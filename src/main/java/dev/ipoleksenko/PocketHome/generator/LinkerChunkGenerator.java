@@ -10,10 +10,10 @@ import java.util.List;
 /**
  * Generates a world with an island at a center
  */
-public class PocketChunkGenerator extends VoidChunkGenerator {
+public class LinkerChunkGenerator extends VoidChunkGenerator {
 
 	@Override
 	public @NotNull List<BlockPopulator> getDefaultPopulators(@NotNull World world) {
-		return Collections.singletonList(new PocketBlockPopulator());
+		return Collections.singletonList(new LinkerBlockPopulator());
 	}
 }

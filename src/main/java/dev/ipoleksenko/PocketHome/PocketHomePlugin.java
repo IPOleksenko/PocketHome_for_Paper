@@ -1,22 +1,21 @@
 package dev.ipoleksenko.PocketHome;
 
-import dev.ipoleksenko.PocketHome.generator.PocketChunkGenerator;
 import dev.ipoleksenko.PocketHome.listener.DamageListener;
 import dev.ipoleksenko.PocketHome.listener.EnderChestListener;
 import dev.ipoleksenko.PocketHome.listener.PlayerListener;
+import dev.ipoleksenko.PocketHome.manager.LinkerManager;
 import dev.ipoleksenko.PocketHome.manager.PocketManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.util.Arrays;
-
 public class PocketHomePlugin extends JavaPlugin {
 
-	private static final String pocketsDir = "pockets";
+	private static final String POCKETS_DIR = "pockets";
+	private static final Integer POCKET_RADIUS = 2; // in chunks; generate (2 * n)^2 chunks
 	private static PocketHomePlugin instance;
 	private PocketManager pocketManager;
+	private LinkerManager linkerManager;
 
 	/**
 	 * Get PocketHome plugin instance
@@ -34,24 +33,38 @@ public class PocketHomePlugin extends JavaPlugin {
 	 */
 	@Contract(pure = true)
 	public static @NotNull String getPocketsDir() {
-		return pocketsDir + '/';
+		return POCKETS_DIR + '/';
+	}
+
+	public static Integer getPocketRadius() {
+		return POCKET_RADIUS;
 	}
 
 	/**
 	 * Get PocketManager instance
 	 *
 	 * @return PocketManager instance
+	 * @see PocketManager
 	 */
 	public PocketManager getPocketManager() {
 		return this.pocketManager;
 	}
 
+	/**
+	 * Get LinkerManager instance
+	 *
+	 * @return LinkerManager instance
+	 * @see LinkerManager
+	 */
+	public LinkerManager getLinkerManager() {
+		return this.linkerManager;
+	}
+
 	@Override
 	public void onEnable() {
 		instance = this;
-		pocketManager = new PocketManager(new PocketChunkGenerator());
-
-		this.loadPocketWorlds();
+		this.pocketManager = new PocketManager();
+		this.linkerManager = new LinkerManager();
 
 		getServer().getPluginManager().registerEvents(new EnderChestListener(), this);
 		getServer().getPluginManager().registerEvents(new PlayerListener(), this);
@@ -60,24 +73,5 @@ public class PocketHomePlugin extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-	}
-
-
-	/**
-	 * Preload (re-create) pocket worlds to be able to teleport into it
-	 */
-	private void loadPocketWorlds() {
-		File dir = new File(getPocketsDir());
-		if (!dir.exists()) return;
-
-		File[] pocketDirs = dir.listFiles();
-		if (pocketDirs == null) return;
-
-		for (File pocketDir : pocketDirs)
-			if (pocketDir.isDirectory()) {
-				String[] pocketFiles = pocketDir.list();
-				if (pocketFiles != null && Arrays.asList(pocketFiles).contains("level.dat"))
-					getPocketManager().getPocketCreator(getPocketsDir() + pocketDir.getName()).createWorld();
-			}
 	}
 }
