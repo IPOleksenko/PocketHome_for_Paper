@@ -13,7 +13,7 @@ repositories {
 }
 
 dependencies {
-	compileOnly("io.papermc.paper:paper-api:${project.properties["paper_version"]}")
+	annotationProcessor("io.papermc.paper:paper-api:${project.properties["paper_version"]}")
 }
 
 java {
