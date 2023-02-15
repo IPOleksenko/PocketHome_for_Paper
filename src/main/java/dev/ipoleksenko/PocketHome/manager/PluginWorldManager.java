@@ -140,7 +140,8 @@ public abstract class PluginWorldManager {
 						.filter(LivingEntity.class::isInstance)
 						.map(LivingEntity.class::cast)
 						.forEach(livingEntity -> {
-							livingEntity.teleport(spawnLocation);
+							livingEntity.setLeashHolder(null);
+							livingEntity.teleport(spawnLocation, TeleportCause.PLUGIN);
 							livingEntity.setLeashHolder(player);
 						});
 
