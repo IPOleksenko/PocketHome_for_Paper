@@ -8,7 +8,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerLeashEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerUnleashEntityEvent;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.jetbrains.annotations.NotNull;
@@ -20,7 +19,10 @@ public class PlayerListener implements Listener {
 	@EventHandler
 	public void join(@NotNull PlayerJoinEvent event) {
 		Player player = event.getPlayer();
-		PocketHomePlugin.getInstance().getPocketManager().teleportTo(player);
+		final PocketManager pocketManager = PocketHomePlugin.getInstance().getPocketManager();
+
+		pocketManager.teleportFrom(player);
+		pocketManager.teleportTo(player);
 		if (!player.hasPlayedBefore()) {
 			player.sendMessage(format("""
 							Hello, %s.
@@ -30,15 +32,6 @@ public class PlayerListener implements Listener {
 							       
 							You can open my menu with the «/home» command.
 							""", player.getName()));
-		}
-	}
-
-	@EventHandler
-	public void onDisconnect(@NotNull PlayerQuitEvent event) {
-		final Player player = event.getPlayer();
-		final PocketManager pocketManager = PocketHomePlugin.getInstance().getPocketManager();
-		if (pocketManager.isInPocket(player)) {
-			pocketManager.teleportFrom(player);
 		}
 	}
 

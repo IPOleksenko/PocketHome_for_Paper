@@ -118,7 +118,6 @@ public abstract class PluginWorldManager {
 	 * @return true, if the teleport was successful
 	 */
 	public boolean teleportFrom(@NotNull Player player) {
-		if (!this.isInPocket(player)) return false;
 		final PersistentDataContainer playerContainer = player.getPersistentDataContainer();
 		Location spawnLocation = playerContainer.get(teleportLocationKey, DataType.LOCATION);
 
