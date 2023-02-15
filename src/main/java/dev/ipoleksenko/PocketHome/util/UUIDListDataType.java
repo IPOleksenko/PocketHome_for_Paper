@@ -27,7 +27,7 @@ public class UUIDListDataType implements PersistentDataType<int[], List> {
 		int[] primitive = new int[complex.size() * 4];
 		List<int[]> ints = ((List<UUID>) complex).stream().map(UUIDDataType::toInts).toList();
 
-		for (int i = 0; i < ints.size(); ++i) {
+		for (int i = 0; i < primitive.length; ++i) {
 			primitive[i] = ints.get(i / 4)[i % 4];
 			primitive[++i] = ints.get(i / 4)[i % 4];
 			primitive[++i] = ints.get(i / 4)[i % 4];
