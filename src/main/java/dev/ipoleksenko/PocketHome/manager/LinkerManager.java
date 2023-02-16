@@ -230,7 +230,10 @@ public class LinkerManager extends PluginWorldManager {
 				for (int linkerChunkZ = -max; linkerChunkZ <= max; linkerChunkZ += 4 * radius) {
 					if (Math.abs(linkerChunkX) != max && Math.abs(linkerChunkZ) != max) continue;
 
-					if (!pocketWorlds.hasNext()) break;
+					if (!pocketWorlds.hasNext()) {
+						if (savePockets) this.clearChunk(linker, linkerChunkX, linkerChunkZ, radius);
+						break;
+					}
 					final World pocket = pocketWorlds.next();
 					for (int pocketChunkX = -radius; pocketChunkX < radius; ++pocketChunkX)
 						for (int pocketChunkZ = -radius; pocketChunkZ < radius; ++pocketChunkZ) {
@@ -248,6 +251,19 @@ public class LinkerManager extends PluginWorldManager {
 						}
 				}
 		}
+	}
+
+	private void clearChunk(World linker, int linkerChunkX, int linkerChunkZ, int radius) {
+		for (int pocketChunkX = -radius; pocketChunkX < radius; ++pocketChunkX)
+			for (int pocketChunkZ = -radius; pocketChunkZ < radius; ++pocketChunkZ) {
+				final Chunk pocketChunk = linker.getChunkAt(linkerChunkX + pocketChunkX, linkerChunkZ + pocketChunkZ);
+				for (int x = 0; x < 16; ++x)
+					for (int y = -64; y < 320; ++y)
+						for (int z = 0; z < 16; ++z) {
+							final Block toBlock = pocketChunk.getBlock(x, y, z);
+							if (toBlock.getType() != Material.AIR) toBlock.setType(Material.AIR);
+						}
+			}
 	}
 
 	private void copyChunk(ChunkSnapshot from, Chunk to) {
