@@ -149,7 +149,7 @@ public class LinkerManager extends PluginWorldManager {
 
 		this.syncChunks(linker, true);
 		this.deleteLinker(linker, otherPlayer);
-		this.syncChunks(linker, false);
+		if (linkedPlayers.size() == 2) this.deleteLinker(player);
 
 		return true;
 	}
@@ -166,8 +166,8 @@ public class LinkerManager extends PluginWorldManager {
 		if (!this.isLinked(otherPlayer)) return false;
 
 		final World linker = this.getLinker(player);
-		final List<Player> linkerPlayers = this.getLinkedPlayers(player).stream().filter(OfflinePlayer::isOnline).map(OfflinePlayer::getPlayer).toList();
-		if (!linkerPlayers.contains(otherPlayer)) return false;
+		final List<Player> linkedPlayers = this.getLinkedPlayers(player).stream().filter(OfflinePlayer::isOnline).map(OfflinePlayer::getPlayer).toList();
+		if (!linkedPlayers.contains(otherPlayer)) return false;
 
 		if (linker == null) return false;
 		for (Player linkerPlayer : linker.getPlayers())
@@ -175,7 +175,7 @@ public class LinkerManager extends PluginWorldManager {
 
 		this.syncChunks(linker, true);
 		this.deleteLinker(otherPlayer);
-		this.syncChunks(linker, false);
+		if (linkedPlayers.size() == 2) this.deleteLinker(player);
 
 		return true;
 	}
