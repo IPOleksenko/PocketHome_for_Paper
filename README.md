@@ -5,6 +5,7 @@
 ## Description
 
 PocketHome is a plugin that adds private areas for all players where they can build freely.
+Also, players can invite guests in their pockets or link pockets in one super-pocket
 
 ## Build
 
@@ -20,16 +21,8 @@ cd PocketHome/
 
 There is available to start a development server:
 
-#### Windows:
-
-```powershell
-run/start.ps1
-```
-
-#### Linux:
-
 ```shell
-run/start.sh
+./gradlew runServer
 ```
 
 ## Contributing
