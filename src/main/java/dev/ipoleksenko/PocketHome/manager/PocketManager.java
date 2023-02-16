@@ -194,7 +194,6 @@ public class PocketManager extends PluginWorldManager {
 		pocketContainer.set(pocketOwnerKey, DataType.UUID, player.getUniqueId());
 
 		this.generateMisc(pocket);
-		pocket.setSpawnLocation(1, 1, -1);
 
 		return pocket;
 	}
@@ -209,9 +208,8 @@ public class PocketManager extends PluginWorldManager {
 		Bukkit.unloadWorld(pocket, true);
 	}
 
-	private void generateMisc(@NotNull World pocket) {
-		pocket.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
-		pocket.getBlockAt(0, 1, 0).setType(Material.ENDER_CHEST);
+	protected void generateMisc(@NotNull World pocket) {
+		super.generateMisc(pocket);
 
 		final WorldBorder border = pocket.getWorldBorder();
 		border.setCenter(0., 0.);

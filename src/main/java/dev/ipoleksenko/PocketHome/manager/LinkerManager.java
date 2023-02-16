@@ -233,7 +233,7 @@ public class LinkerManager extends PluginWorldManager {
 
 		linkerContainer.set(linkedPocketKey, DataType.STRING_LIST, linkedPockets);
 
-		linker.setSpawnLocation(8, 1, 8);
+		super.generateMisc(linker);
 
 		return linker;
 	}

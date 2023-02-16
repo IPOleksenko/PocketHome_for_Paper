@@ -148,13 +148,6 @@ public abstract class PluginWorldManager {
 		return true;
 	}
 
-	private @NotNull List<UUID> getLeashedEntities(@NotNull PersistentDataContainer playerContainer, boolean clearList) {
-		List<UUID> leashedEntities = playerContainer.get(leashedEntityKey, DataType.UUID_LIST);
-		if (leashedEntities == null) leashedEntities = new LinkedList<>();
-		if (clearList) this.clearLeashedEntity(playerContainer);
-		return leashedEntities;
-	}
-
 	public void addLeashed(@NotNull PersistentDataContainer playerContainer, @NotNull Entity entity) {
 		final List<UUID> leashedEntities = this.getLeashedEntities(playerContainer, true);
 		final UUID entityUID = entity.getUniqueId();
@@ -173,5 +166,33 @@ public abstract class PluginWorldManager {
 
 	public void clearLeashedEntity(@NotNull PersistentDataContainer playerContainer) {
 		playerContainer.set(leashedEntityKey, DataType.UUID_LIST, new LinkedList<UUID>());
+	}
+
+	private @NotNull List<UUID> getLeashedEntities(@NotNull PersistentDataContainer playerContainer, boolean clearList) {
+		List<UUID> leashedEntities = playerContainer.get(leashedEntityKey, DataType.UUID_LIST);
+		if (leashedEntities == null) leashedEntities = new LinkedList<>();
+		if (clearList) this.clearLeashedEntity(playerContainer);
+		return leashedEntities;
+	}
+
+	protected void generateMisc(@NotNull World world) {
+		world.setGameRule(GameRule.DISABLE_RAIDS, true);
+		world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
+		world.setGameRule(GameRule.DO_FIRE_TICK, false);
+		world.setGameRule(GameRule.DO_INSOMNIA, false);
+		world.setGameRule(GameRule.DO_MOB_SPAWNING, false);
+		world.setGameRule(GameRule.DO_PATROL_SPAWNING, false);
+		world.setGameRule(GameRule.DO_TRADER_SPAWNING, false);
+		world.setGameRule(GameRule.DO_WARDEN_SPAWNING, false);
+		world.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
+		world.setGameRule(GameRule.DROWNING_DAMAGE, false);
+		world.setGameRule(GameRule.FALL_DAMAGE, false);
+		world.setGameRule(GameRule.FIRE_DAMAGE, false);
+		world.setGameRule(GameRule.FREEZE_DAMAGE, false);
+		world.setGameRule(GameRule.KEEP_INVENTORY, true);
+		world.setGameRule(GameRule.MOB_GRIEFING, false);
+
+		world.getBlockAt(0, 1, 0).setType(Material.ENDER_CHEST);
+		world.setSpawnLocation(1, 1, -1);
 	}
 }
