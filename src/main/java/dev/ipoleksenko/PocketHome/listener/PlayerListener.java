@@ -1,5 +1,6 @@
 package dev.ipoleksenko.PocketHome.listener;
 
+import com.destroystokyo.paper.event.player.PlayerPostRespawnEvent;
 import dev.ipoleksenko.PocketHome.PocketHomePlugin;
 import dev.ipoleksenko.PocketHome.manager.PocketManager;
 import org.bukkit.entity.Entity;
@@ -20,9 +21,9 @@ public class PlayerListener implements Listener {
 		Player player = event.getPlayer();
 		final PocketManager pocketManager = PocketHomePlugin.getInstance().getPocketManager();
 
-		pocketManager.teleportFrom(player);
-		pocketManager.teleportTo(player);
 		if (!player.hasPlayedBefore()) {
+			pocketManager.teleportTo(player);
+			pocketManager.teleportTo(player);
 			player.sendMessage(format("""
 							Hello, %s.    
 							I'm a PocketHome.
@@ -31,6 +32,12 @@ public class PlayerListener implements Listener {
 		}
 	}
 
+	@EventHandler
+	public void teleportationAfterDeath(@NotNull PlayerPostRespawnEvent event){
+		Player player = event.getPlayer();
+		final PocketManager pocketManager = PocketHomePlugin.getInstance().getPocketManager();
+		pocketManager.teleportTo(player);
+	}
 	@EventHandler
 	public void onLeash(@NotNull PlayerLeashEntityEvent event) {
 		final Player player = event.getPlayer();
