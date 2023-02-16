@@ -139,15 +139,17 @@ public class LinkerManager extends PluginWorldManager {
 	 */
 	public boolean unlinkPockets(@NotNull Player player, @NotNull OfflinePlayer otherPlayer) {
 		if (!this.isLinked(player)) return false;
+		if (otherPlayer.isOnline()) return this.unlinkPockets(player, otherPlayer.getPlayer());
 
 		final World linker = this.getLinker(player);
-		final List<OfflinePlayer> linkedPlayers = this.getLinkedPlayers(player).stream().filter(offlinePlayer -> offlinePlayer == otherPlayer).toList();
-		if (linker == player.getWorld()) this.teleportFrom(player);
-
+		final List<OfflinePlayer> linkedPlayers = this.getLinkedPlayers(player).stream().filter(otherPlayer::equals).toList();
 		if (linkedPlayers.isEmpty()) return false;
+
+		if (linker == player.getWorld()) this.teleportFrom(player);
 
 		this.syncChunks(linker, true);
 		this.deleteLinker(linker, otherPlayer);
+		this.syncChunks(linker, false);
 
 		return true;
 	}
@@ -156,19 +158,23 @@ public class LinkerManager extends PluginWorldManager {
 	/**
 	 * Unlinks Player Pocket from Linker
 	 *
-	 * @param player target Player object
+	 * @param player      Player object to get Linker
+	 * @param otherPlayer target Player object
 	 * @return true, if Player Pocket is linked
 	 */
-	public boolean unlinkPockets(@NotNull Player player) {
-		if (!this.isLinked(player)) return false;
+	public boolean unlinkPockets(@NotNull Player player, @NotNull Player otherPlayer) {
+		if (!this.isLinked(otherPlayer)) return false;
 
 		final World linker = this.getLinker(player);
+		final List<Player> linkerPlayers = this.getLinkedPlayers(player).stream().filter(OfflinePlayer::isOnline).map(OfflinePlayer::getPlayer).toList();
+		if (!linkerPlayers.contains(otherPlayer)) return false;
+
 		if (linker == null) return false;
 		for (Player linkerPlayer : linker.getPlayers())
 			this.teleportFrom(linkerPlayer);
 
 		this.syncChunks(linker, true);
-		this.deleteLinker(player);
+		this.deleteLinker(otherPlayer);
 		this.syncChunks(linker, false);
 
 		return true;
@@ -182,10 +188,7 @@ public class LinkerManager extends PluginWorldManager {
 		final List<String> linkerPocketsName = linkerContainer.get(linkedPocketKey, DataType.STRING_LIST);
 		if (linkerPocketsName == null) return new LinkedList<>();
 
-		return linkerPocketsName.stream()
-						.map(pocketInstance::loadPocket)
-						.map(pocketInstance::getPocketOwner)
-						.toList();
+		return linkerPocketsName.stream().map(pocketInstance::loadPocket).map(pocketInstance::getPocketOwner).toList();
 	}
 
 
