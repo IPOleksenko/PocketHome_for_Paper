@@ -130,6 +130,35 @@ public abstract class PluginWorldManager {
 		return this.teleportPlayer(player, spawnLocation);
 	}
 
+	/**
+	 * Adds n-ticks to current Pocket/Linker time
+	 *
+	 * @param player target Player object for getting a Pocket/Linker world
+	 * @param time   ticks to add
+	 */
+	public void addTime(@NotNull Player player, Long time) {
+		if (!this.isInPocket(player)) return;
+		if (time < 1) return;
+
+		final World pocket = player.getWorld();
+		final Long currentTime = pocket.getTime();
+		this.setTime(player, currentTime + time);
+	}
+
+	/**
+	 * Sets n-ticks for Pocket/Linker time
+	 *
+	 * @param player target Player object for getting a Pocket/Linker world
+	 * @param time   ticks to set
+	 */
+	public void setTime(@NotNull Player player, Long time) {
+		if (!this.isInPocket(player)) return;
+		if (time < 1) return;
+
+		final World pocket = player.getWorld();
+		pocket.setTime(time);
+	}
+
 	private boolean teleportPlayer(@NotNull Player player, Location spawnLocation) {
 		player.teleport(spawnLocation, TeleportCause.PLUGIN);
 
