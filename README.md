@@ -1,4 +1,4 @@
-<img src="assets/logo.png" width="128" alt="logo">
+<img src=".github/logo.png" width="128" alt="logo">
 
 # Pocket dimensions Spigot (Paper) plugin
 
