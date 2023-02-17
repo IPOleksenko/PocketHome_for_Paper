@@ -54,8 +54,22 @@ public class LinkerManager extends PluginWorldManager {
 	 * @return true if linked
 	 */
 	public boolean isLinked(@NotNull Player player) {
+		final World pocket = pocketInstance.getPocket(player);
+		final World linker = this.getLinker(player);
+		if (linker == null || pocket == null) return false;
+
 		final PersistentDataContainer playerContainer = player.getPersistentDataContainer();
-		return playerContainer.has(linkedPocketKey);
+		final PersistentDataContainer pocketContainer = pocket.getPersistentDataContainer();
+		final PersistentDataContainer linkerContainer = linker.getPersistentDataContainer();
+
+		final List<String> linkerPocketsName = linkerContainer.getOrDefault(linkedPocketKey, DataType.STRING_LIST, new LinkedList<String>());
+		final String pocketName = playerContainer.getOrDefault(pocketKey, PersistentDataType.STRING, "");
+		if (!linkerPocketsName.contains(pocketName)) {
+			playerContainer.remove(linkedPocketKey);
+			pocketContainer.remove(linkedPocketKey);
+		}
+
+		return linkerPocketsName.contains(pocketName);
 	}
 
 	/**
@@ -117,20 +131,64 @@ public class LinkerManager extends PluginWorldManager {
 	}
 
 	/**
-	 * Unlinks Player Pocket from Linker
+	 * Unlinks OfflinePlayer Pocket from Linker
 	 *
-	 * @param player target Player object
-	 * @return true, if Player Pocket is linked
+	 * @param player      Player object to get Linker
+	 * @param otherPlayer target OfflinePlayer object
+	 * @return true, if unlink successful
 	 */
-	public boolean unlinkPockets(@NotNull Player player) {
+	public boolean unlinkPockets(@NotNull Player player, @NotNull OfflinePlayer otherPlayer) {
 		if (!this.isLinked(player)) return false;
+		if (otherPlayer.isOnline()) return this.unlinkPockets(player, otherPlayer.getPlayer());
 
 		final World linker = this.getLinker(player);
+		final List<OfflinePlayer> linkedPlayers = this.getLinkedPlayers(player).stream().filter(otherPlayer::equals).toList();
+		if (linkedPlayers.isEmpty()) return false;
+
 		if (linker == player.getWorld()) this.teleportFrom(player);
 
 		this.syncChunks(linker, true);
-		this.deleteLinker(player);
+		this.deleteLinker(linker, otherPlayer);
+		if (linkedPlayers.size() == 2) this.deleteLinker(player);
+
 		return true;
+	}
+
+
+	/**
+	 * Unlinks Player Pocket from Linker
+	 *
+	 * @param player      Player object to get Linker
+	 * @param otherPlayer target Player object
+	 * @return true, if Player Pocket is linked
+	 */
+	public boolean unlinkPockets(@NotNull Player player, @NotNull Player otherPlayer) {
+		if (!this.isLinked(otherPlayer)) return false;
+
+		final World linker = this.getLinker(player);
+		final List<Player> linkedPlayers = this.getLinkedPlayers(player).stream().filter(OfflinePlayer::isOnline).map(OfflinePlayer::getPlayer).toList();
+		if (!linkedPlayers.contains(otherPlayer)) return false;
+
+		if (linker == null) return false;
+		for (Player linkerPlayer : linker.getPlayers())
+			this.teleportFrom(linkerPlayer);
+
+		this.syncChunks(linker, true);
+		this.deleteLinker(otherPlayer);
+		if (linkedPlayers.size() == 2) this.deleteLinker(player);
+
+		return true;
+	}
+
+	public List<OfflinePlayer> getLinkedPlayers(@NotNull Player player) {
+		final World linker = this.getLinker(player);
+		if (linker == null) return null;
+
+		final PersistentDataContainer linkerContainer = linker.getPersistentDataContainer();
+		final List<String> linkerPocketsName = linkerContainer.get(linkedPocketKey, DataType.STRING_LIST);
+		if (linkerPocketsName == null) return new LinkedList<>();
+
+		return linkerPocketsName.stream().map(pocketInstance::loadPocket).map(pocketInstance::getPocketOwner).toList();
 	}
 
 
@@ -175,7 +233,10 @@ public class LinkerManager extends PluginWorldManager {
 				for (int linkerChunkZ = -max; linkerChunkZ <= max; linkerChunkZ += 4 * radius) {
 					if (Math.abs(linkerChunkX) != max && Math.abs(linkerChunkZ) != max) continue;
 
-					if (!pocketWorlds.hasNext()) break;
+					if (!pocketWorlds.hasNext()) {
+						if (savePockets) this.clearChunk(linker, linkerChunkX, linkerChunkZ, radius);
+						break;
+					}
 					final World pocket = pocketWorlds.next();
 					for (int pocketChunkX = -radius; pocketChunkX < radius; ++pocketChunkX)
 						for (int pocketChunkZ = -radius; pocketChunkZ < radius; ++pocketChunkZ) {
@@ -193,6 +254,19 @@ public class LinkerManager extends PluginWorldManager {
 						}
 				}
 		}
+	}
+
+	private void clearChunk(World linker, int linkerChunkX, int linkerChunkZ, int radius) {
+		for (int pocketChunkX = -radius; pocketChunkX < radius; ++pocketChunkX)
+			for (int pocketChunkZ = -radius; pocketChunkZ < radius; ++pocketChunkZ) {
+				final Chunk pocketChunk = linker.getChunkAt(linkerChunkX + pocketChunkX, linkerChunkZ + pocketChunkZ);
+				for (int x = 0; x < 16; ++x)
+					for (int y = -64; y < 320; ++y)
+						for (int z = 0; z < 16; ++z) {
+							final Block toBlock = pocketChunk.getBlock(x, y, z);
+							if (toBlock.getType() != Material.AIR) toBlock.setType(Material.AIR);
+						}
+			}
 	}
 
 	private void copyChunk(ChunkSnapshot from, Chunk to) {
@@ -240,6 +314,7 @@ public class LinkerManager extends PluginWorldManager {
 
 	private void deleteLinker(@NotNull Player player) {
 		final World linker = this.getLinker(player);
+		if (linker == null) return;
 
 		final PersistentDataContainer playerContainer = player.getPersistentDataContainer();
 		final PersistentDataContainer linkerContainer = linker.getPersistentDataContainer();
@@ -249,9 +324,18 @@ public class LinkerManager extends PluginWorldManager {
 		List<String> linkedPockets = linkerContainer.get(linkedPocketKey, DataType.STRING_LIST);
 		if (linkedPockets == null) linkedPockets = new LinkedList<>();
 
-		String pocketName = playerContainer.get(pocketKey, PersistentDataType.STRING);
+		final String pocketName = playerContainer.get(pocketKey, PersistentDataType.STRING);
 		linkedPockets.remove(pocketName);
 		linkerContainer.set(linkedPocketKey, DataType.STRING_LIST, linkedPockets);
 	}
 
+	private void deleteLinker(@NotNull World linker, @NotNull OfflinePlayer player) {
+		final PersistentDataContainer linkerContainer = linker.getPersistentDataContainer();
+
+		List<String> linkedPockets = linkerContainer.get(linkedPocketKey, DataType.STRING_LIST);
+		if (linkedPockets == null) linkedPockets = new LinkedList<>();
+
+		linkedPockets.remove(player.getName());
+		linkerContainer.set(linkedPocketKey, DataType.STRING_LIST, linkedPockets);
+	}
 }

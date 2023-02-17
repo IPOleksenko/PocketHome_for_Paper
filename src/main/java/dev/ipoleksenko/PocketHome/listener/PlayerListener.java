@@ -6,6 +6,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.PlayerLeashEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerUnleashEntityEvent;
@@ -49,5 +50,13 @@ public class PlayerListener implements Listener {
 		final PocketManager pocketManager = PocketHomePlugin.getInstance().getPocketManager();
 
 		pocketManager.removeLeashed(playerContainer, entity);
+	}
+
+	@EventHandler
+	public void onDeath(@NotNull PlayerDeathEvent event) {
+		final Player player = event.getPlayer();
+		final PersistentDataContainer playerContainer = player.getPersistentDataContainer();
+		final PocketManager pocketManager = PocketHomePlugin.getInstance().getPocketManager();
+		pocketManager.clearLeashedEntity(playerContainer);
 	}
 }

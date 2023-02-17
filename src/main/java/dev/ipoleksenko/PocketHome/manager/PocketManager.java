@@ -59,10 +59,16 @@ public class PocketManager extends PluginWorldManager {
 	 * @return true on successful teleport, false if pocket doesn't exist
 	 */
 	protected boolean teleportToPocket(@NotNull Player player, @NotNull Player otherPlayer) {
+		if (player != otherPlayer && !this.isGuest(player, otherPlayer)) return false;
+
 		final World pocket = this.getPocket(otherPlayer);
 		if (pocket == null) return false;
 
 		return super.teleportTo(player, pocket);
+	}
+
+	public boolean isGuest(@NotNull Player player, @NotNull Player otherPlayer) {
+		return this.getPocketGuests(player).contains(otherPlayer);
 	}
 
 	/**
@@ -81,6 +87,18 @@ public class PocketManager extends PluginWorldManager {
 
 		this.addGuest(pocketContainer, DataType.UUID_LIST, guest.getUniqueId());
 		this.addGuest(guestContainer, DataType.STRING_LIST, pocket.getName());
+
+		return true;
+	}
+
+	public boolean removeGuestFromPocket(@NotNull Player owner, @NotNull OfflinePlayer guest) {
+		if (guest.isOnline()) return this.removeGuestFromPocket(owner, guest.getPlayer());
+
+		final World pocket = this.getPocket(owner);
+		if (pocket == null) return false;
+
+		final PersistentDataContainer pocketContainer = pocket.getPersistentDataContainer();
+		this.removeGuest(pocketContainer, DataType.UUID_LIST, guest.getUniqueId());
 
 		return true;
 	}
@@ -128,9 +146,9 @@ public class PocketManager extends PluginWorldManager {
 	 * @param player Player object, pocket owner
 	 * @return List of guests, null if player hasn't pocket
 	 */
-	public @Nullable List<OfflinePlayer> getPocketGuests(@NotNull Player player) {
+	public List<OfflinePlayer> getPocketGuests(@NotNull Player player) {
 		final World pocket = this.getPocket(player);
-		return (pocket != null) ? this.getPocketGuests(pocket) : null;
+		return (pocket != null) ? this.getPocketGuests(pocket) : new LinkedList<>();
 	}
 
 	/**
