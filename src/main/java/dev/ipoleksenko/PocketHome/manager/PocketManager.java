@@ -4,6 +4,7 @@ import dev.ipoleksenko.PocketHome.PocketHomePlugin;
 import dev.ipoleksenko.PocketHome.generator.PocketChunkGenerator;
 import dev.ipoleksenko.PocketHome.util.DataType;
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -197,7 +198,16 @@ public class PocketManager extends PluginWorldManager {
 
 	// meh
 	protected @Nullable World getPocket(@NotNull Player player) {
-		return this.createPocket(player);
+		final World pocket = this.createPocket(player);
+		final int radius = PocketHomePlugin.getPocketRadius();
+
+		for (int x = -radius; x < radius; ++x)
+			for (int z = -radius; z < radius; ++z) {
+				final Block block = pocket.getBlockAt(x, -64, z);
+				if (block.getType() != Material.BEDROCK) block.setType(Material.BEDROCK);
+			}
+
+		return pocket;
 	}
 
 	private @NotNull World createPocket(@NotNull Player player) {
