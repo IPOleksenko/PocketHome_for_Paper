@@ -138,11 +138,9 @@ public abstract class PluginWorldManager {
 	 */
 	public void addTime(@NotNull Player player, Long time) {
 		if (!this.isInPocket(player)) return;
-		if (time < 1) return;
 
 		final World pocket = player.getWorld();
-		final Long currentTime = pocket.getTime();
-		this.setTime(player, currentTime + time);
+		this.setTime(pocket, pocket.getTime() + time);
 	}
 
 	/**
@@ -153,9 +151,14 @@ public abstract class PluginWorldManager {
 	 */
 	public void setTime(@NotNull Player player, Long time) {
 		if (!this.isInPocket(player)) return;
-		if (time < 1) return;
 
 		final World pocket = player.getWorld();
+		this.setTime(pocket, time);
+	}
+
+	private void setTime(@NotNull World pocket, Long time) {
+		if (time < 1) return;
+
 		pocket.setTime(time);
 	}
 
