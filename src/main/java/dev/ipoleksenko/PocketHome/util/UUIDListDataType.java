@@ -9,7 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-public class UUIDListDataType implements PersistentDataType<int[], List> {
+public class UUIDListDataType implements PersistentDataType<int[], List<UUID>> {
 	@Override
 	@NotNull
 	public Class<int[]> getPrimitiveType() {
@@ -18,14 +18,14 @@ public class UUIDListDataType implements PersistentDataType<int[], List> {
 
 	@Override
 	@NotNull
-	public Class<List> getComplexType() {
-		return List.class;
+	public Class<List<UUID>> getComplexType() {
+		return (Class<List<UUID>>) (Class<?>) List.class;
 	}
 
 	@Override
-	public int @NotNull [] toPrimitive(@NotNull List complex, @NotNull PersistentDataAdapterContext context) {
+	public int @NotNull [] toPrimitive(@NotNull List<UUID> complex, @NotNull PersistentDataAdapterContext context) {
 		int[] primitive = new int[complex.size() * 4];
-		List<int[]> ints = ((List<UUID>) complex).stream().map(UUIDDataType::toInts).toList();
+		List<int[]> ints = complex.stream().map(UUIDDataType::toInts).toList();
 
 		for (int i = 0; i < primitive.length; ++i) {
 			primitive[i] = ints.get(i / 4)[i % 4];

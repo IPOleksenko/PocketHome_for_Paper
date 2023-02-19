@@ -7,7 +7,6 @@ import dev.ipoleksenko.PocketHome.listener.PlayerListener;
 import dev.ipoleksenko.PocketHome.manager.LinkerManager;
 import dev.ipoleksenko.PocketHome.manager.PocketManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 public class PocketHomePlugin extends JavaPlugin {
@@ -32,7 +31,6 @@ public class PocketHomePlugin extends JavaPlugin {
 	 *
 	 * @return Pockets directory
 	 */
-	@Contract(pure = true)
 	public static @NotNull String getPocketsDir() {
 		return POCKETS_DIR + '/';
 	}
