@@ -34,7 +34,7 @@ public abstract class PluginWorldManager {
 		this.leashedEntitiesKey = Objects.requireNonNull(NamespacedKey.fromString("leashed_entities", PocketHomePlugin.getInstance()));
 	}
 
-	protected @NotNull String getUniqueId(String prefix) {
+	protected String getUniqueId() {
 		final Base64.Encoder encoder = Base64.getUrlEncoder();
 		final ByteBuffer bb = ByteBuffer.wrap(new byte[8]);
 		final UUID uuid = UUID.randomUUID();
@@ -42,7 +42,11 @@ public abstract class PluginWorldManager {
 		bb.putLong(uuid.getLeastSignificantBits());
 		final byte[] bytes = bb.array();
 
-		return prefix + encoder.encodeToString(bytes).replace("=", "").toLowerCase();
+		return encoder.encodeToString(bytes).replace("=", "").toLowerCase();
+	}
+
+	protected String getUniqueId(String prefix) {
+		return prefix + this.getUniqueId();
 	}
 
 	/**
