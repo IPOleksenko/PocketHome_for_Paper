@@ -9,7 +9,6 @@ import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -61,10 +60,7 @@ public class PocketManager extends PluginWorldManager {
 	 */
 	protected boolean teleportToPocket(@NotNull Player player, @NotNull Player otherPlayer) {
 		if (player != otherPlayer && !this.isGuest(player, otherPlayer)) return false;
-
 		final World pocket = this.getPocket(otherPlayer);
-		if (pocket == null) return false;
-
 		return super.teleportTo(player, pocket);
 	}
 
@@ -88,7 +84,6 @@ public class PocketManager extends PluginWorldManager {
 	 */
 	public boolean addGuestToPocket(@NotNull Player owner, @NotNull Player guest) {
 		final World pocket = this.getPocket(owner);
-		if (pocket == null) return false;
 
 		final PersistentDataContainer pocketContainer = pocket.getPersistentDataContainer();
 		final PersistentDataContainer guestContainer = guest.getPersistentDataContainer();
@@ -109,9 +104,7 @@ public class PocketManager extends PluginWorldManager {
 	public boolean removeGuestFromPocket(@NotNull Player owner, @NotNull OfflinePlayer guest) {
 		final Player guestOnline = guest.getPlayer();
 		if (guestOnline != null) return this.removeGuestFromPocket(owner, guestOnline);
-
 		final World pocket = this.getPocket(owner);
-		if (pocket == null) return false;
 
 		final PersistentDataContainer pocketContainer = pocket.getPersistentDataContainer();
 		this.removeGuest(pocketContainer, DataType.UUID_LIST, guest.getUniqueId());
@@ -128,9 +121,7 @@ public class PocketManager extends PluginWorldManager {
 	 */
 	public boolean removeGuestFromPocket(@NotNull Player owner, @NotNull Player guest) {
 		if (!this.isGuest(owner, guest)) return false;
-
 		final World pocket = this.getPocket(owner);
-		if (pocket == null) return false;
 
 		final PersistentDataContainer pocketContainer = pocket.getPersistentDataContainer();
 		final PersistentDataContainer guestContainer = guest.getPersistentDataContainer();
@@ -166,7 +157,7 @@ public class PocketManager extends PluginWorldManager {
 	 */
 	public List<OfflinePlayer> getPocketGuests(@NotNull Player player) {
 		final World pocket = this.getPocket(player);
-		return (pocket != null) ? this.getPocketGuests(pocket) : new LinkedList<>();
+		return this.getPocketGuests(pocket);
 	}
 
 	/**
@@ -213,7 +204,7 @@ public class PocketManager extends PluginWorldManager {
 	}
 
 	// meh
-	protected @Nullable World getPocket(@NotNull Player player) {
+	protected @NotNull World getPocket(@NotNull Player player) {
 		return this.createPocket(player);
 	}
 

@@ -109,9 +109,8 @@ public class LinkerManager extends PluginWorldManager {
 	public boolean linkPockets(@NotNull Player player, @NotNull Player otherPlayer) {
 		if (this.isLinked(player) && this.isLinked(otherPlayer)) return false;
 
-		World pocket = pocketInstance.getPocket(player);
-		World otherPocket = pocketInstance.getPocket(otherPlayer);
-		if (pocket == null || otherPocket == null) return false;
+		final World pocket = pocketInstance.getPocket(player);
+		final World otherPocket = pocketInstance.getPocket(otherPlayer);
 
 		pocketInstance.unloadPocket(pocket);
 		pocketInstance.unloadPocket(otherPocket);
