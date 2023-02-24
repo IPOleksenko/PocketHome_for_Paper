@@ -116,17 +116,14 @@ public class LinkerManager extends PluginWorldManager {
 		pocketInstance.unloadPocket(pocket);
 		pocketInstance.unloadPocket(otherPocket);
 
-		World linker = null;
-		if (this.isLinked(player)) linker = this.getLinker(player);
-		else if (this.isLinked(otherPlayer)) linker = this.getLinker(otherPlayer);
+		final World linker = this.isLinked(player)
+						? Objects.requireNonNull(this.getLinker(player))
+						: this.isLinked(otherPlayer)
+						? Objects.requireNonNull(this.getLinker(otherPlayer))
+						: this.createLinker(player, otherPlayer);
 
-		if (linker == null) linker = this.createLinker(player, otherPlayer);
-		else {
-			this.syncChunks(linker, true);
-			linker = this.createLinker(player, otherPlayer, linker.getName().split("/")[1]);
-		}
-
-		this.syncChunks(linker, false);
+		if (this.isLinked(player) || this.isLinked(otherPlayer))
+			this.createLinker(player, otherPlayer, linker.getName().split("/")[1]);
 
 		return true;
 	}
@@ -149,7 +146,6 @@ public class LinkerManager extends PluginWorldManager {
 
 		if (linker == player.getWorld()) this.teleportFrom(player);
 
-		this.syncChunks(linker, true);
 		this.deleteLinker(linker, otherPlayer);
 		if (linkedPlayers.size() == 2) this.deleteLinker(player);
 
@@ -175,7 +171,6 @@ public class LinkerManager extends PluginWorldManager {
 		for (Player linkerPlayer : linker.getPlayers())
 			this.teleportFrom(linkerPlayer);
 
-		this.syncChunks(linker, true);
 		this.deleteLinker(otherPlayer);
 		if (linkedPlayers.size() == 2) this.deleteLinker(player);
 
@@ -325,6 +320,8 @@ public class LinkerManager extends PluginWorldManager {
 		linkerContainer.set(linkedPocketKey, DataType.STRING_LIST, linkedPockets);
 
 		super.generateMisc(linker);
+
+		this.syncChunks(linker, false);
 
 		return linker;
 	}
