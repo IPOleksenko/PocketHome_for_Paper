@@ -16,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 public class LinkerManager extends PluginWorldManager {
 
@@ -62,7 +63,7 @@ public class LinkerManager extends PluginWorldManager {
 		final PersistentDataContainer pocketContainer = pocket.getPersistentDataContainer();
 		final PersistentDataContainer linkerContainer = linker.getPersistentDataContainer();
 
-		final List<String> linkerPocketsName = linkerContainer.getOrDefault(linkedPocketKey, DataType.STRING_LIST, new LinkedList<String>());
+		final List<String> linkerPocketsName = linkerContainer.getOrDefault(linkedPocketKey, DataType.STRING_LIST, new LinkedList<>());
 		final String pocketName = playerContainer.getOrDefault(pocketKey, PersistentDataType.STRING, "");
 		if (!linkerPocketsName.contains(pocketName)) {
 			playerContainer.remove(linkedPocketKey);
@@ -139,9 +140,10 @@ public class LinkerManager extends PluginWorldManager {
 	 */
 	public boolean unlinkPockets(@NotNull Player player, @NotNull OfflinePlayer otherPlayer) {
 		if (!this.isLinked(player)) return false;
-		if (otherPlayer.isOnline()) return this.unlinkPockets(player, otherPlayer.getPlayer());
+		if (otherPlayer.isOnline()) return this.unlinkPockets(player, (Player) otherPlayer);
 
-		final World linker = this.getLinker(player);
+		final @NotNull World linker = Objects.requireNonNull(this.getLinker(player));
+
 		final List<OfflinePlayer> linkedPlayers = this.getLinkedPlayers(player).stream().filter(otherPlayer::equals).toList();
 		if (linkedPlayers.isEmpty()) return false;
 
@@ -180,6 +182,12 @@ public class LinkerManager extends PluginWorldManager {
 		return true;
 	}
 
+	/**
+	 * Get all linked Players at Linker
+	 *
+	 * @param player Player object, Linker member
+	 * @return List of OfflinePlayer Linker members
+	 */
 	public List<OfflinePlayer> getLinkedPlayers(@NotNull Player player) {
 		final World linker = this.getLinker(player);
 		if (linker == null) return null;
@@ -288,7 +296,7 @@ public class LinkerManager extends PluginWorldManager {
 	}
 
 	private @NotNull World createLinker(@NotNull Player player, @NotNull Player otherPlayer, String linkerName) {
-		final World linker = this.getLinkerCreator(linkerName).createWorld();
+		final @NotNull World linker = Objects.requireNonNull(this.getLinkerCreator(linkerName).createWorld());
 
 		final PersistentDataContainer playerContainer = player.getPersistentDataContainer();
 		final PersistentDataContainer otherPlayerContainer = otherPlayer.getPersistentDataContainer();
