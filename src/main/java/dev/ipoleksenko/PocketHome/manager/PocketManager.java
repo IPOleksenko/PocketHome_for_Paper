@@ -145,17 +145,17 @@ public class PocketManager extends PluginWorldManager {
 	}
 
 	/**
-	 * Get all Pockets that can be visited by Player
+	 * Get all Pocket owners that can be visited by Player
 	 *
 	 * @param player target Player object
 	 * @return List of available to visit Pockets
 	 */
-	public List<World> getGuestPockets(@NotNull Player player) {
+	public List<OfflinePlayer> getGuestPockets(@NotNull Player player) {
 		final PersistentDataContainer playerContainer = player.getPersistentDataContainer();
 		final List<String> guestPockets = playerContainer.get(pocketGuestsKey, DataType.STRING_LIST);
 		if (guestPockets == null) return new LinkedList<>();
 
-		return guestPockets.stream().map(Bukkit::getWorld).toList();
+		return guestPockets.stream().map(Bukkit::getWorld).filter(Objects::nonNull).map(this::getPocketOwner).toList();
 	}
 
 	/**
@@ -189,7 +189,7 @@ public class PocketManager extends PluginWorldManager {
 	 * @param pocket Pocket object
 	 * @return OfflinePlayer object
 	 */
-	protected OfflinePlayer getPocketOwner(@NotNull World pocket) {
+	protected @NotNull OfflinePlayer getPocketOwner(@NotNull World pocket) {
 		final PersistentDataContainer pocketContainer = pocket.getPersistentDataContainer();
 		final @NotNull UUID ownerUID = Objects.requireNonNull(pocketContainer.get(pocketOwnerKey, DataType.UUID));
 
