@@ -213,19 +213,6 @@ public class LinkerManager extends PluginWorldManager {
 		return level;
 	}
 
-	protected @Nullable World getLinker(@NotNull Player player) {
-		final PersistentDataContainer playerContainer = player.getPersistentDataContainer();
-		final String linkerName = playerContainer.get(linkedPocketKey, PersistentDataType.STRING);
-		if (linkerName == null) return null;
-
-		World linker = Bukkit.getWorld(getWorldPath(linkerName));
-		if (linker == null) linker = this.createLinker(player, player, linkerName);
-
-		this.syncChunks(linker, true);
-
-		return linker;
-	}
-
 	private void syncChunks(@NotNull World linker, boolean savePockets) {
 		final PersistentDataContainer linkerContainer = linker.getPersistentDataContainer();
 		List<String> linkerPocketNames = linkerContainer.get(linkedPocketKey, DataType.STRING_LIST);
@@ -289,6 +276,19 @@ public class LinkerManager extends PluginWorldManager {
 					toBlock.setType(fromBlockType);
 					toBlock.setBlockData(fromBlockData);
 				}
+	}
+
+	protected @Nullable World getLinker(@NotNull Player player) {
+		final PersistentDataContainer playerContainer = player.getPersistentDataContainer();
+		final String linkerName = playerContainer.get(linkedPocketKey, PersistentDataType.STRING);
+		if (linkerName == null) return null;
+
+		World linker = Bukkit.getWorld(getWorldPath(linkerName));
+		if (linker == null) linker = this.createLinker(player, player, linkerName);
+
+		this.syncChunks(linker, true);
+
+		return linker;
 	}
 
 	private @NotNull World createLinker(Player player, Player otherPlayer) {
