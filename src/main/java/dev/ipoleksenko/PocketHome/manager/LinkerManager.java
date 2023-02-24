@@ -141,7 +141,7 @@ public class LinkerManager extends PluginWorldManager {
 		if (!this.isLinked(player)) return false;
 		if (otherPlayer.isOnline()) return this.unlinkPockets(player, (Player) otherPlayer);
 
-		final @NotNull World linker = Objects.requireNonNull(this.getLinker(player));
+		final World linker = Objects.requireNonNull(this.getLinker(player));
 
 		final List<OfflinePlayer> linkedPlayers = this.getLinkedPlayers(player).stream().filter(otherPlayer::equals).toList();
 		if (linkedPlayers.isEmpty()) return false;
@@ -214,8 +214,7 @@ public class LinkerManager extends PluginWorldManager {
 
 	private void syncChunks(@NotNull World linker, boolean savePockets) {
 		final PersistentDataContainer linkerContainer = linker.getPersistentDataContainer();
-		List<String> linkerPocketNames = linkerContainer.get(linkedPocketKey, DataType.STRING_LIST);
-		if (linkerPocketNames == null) linkerPocketNames = new LinkedList<>();
+		final List<String> linkerPocketNames = linkerContainer.getOrDefault(linkedPocketKey, DataType.STRING_LIST, new LinkedList<>());
 
 		final int radius = PocketHomePlugin.getPocketRadius();
 		final int linkerLevels = this.getLevelAtChunks(linkerPocketNames.size());
@@ -282,7 +281,7 @@ public class LinkerManager extends PluginWorldManager {
 		final String linkerName = playerContainer.get(linkedPocketKey, PersistentDataType.STRING);
 		if (linkerName == null) return null;
 
-		World linker = Bukkit.getWorld(getWorldPath(linkerName));
+		World linker = Bukkit.getWorld(getLinkedPath(linkerName));
 		if (linker == null) linker = this.createLinker(player, player, linkerName);
 
 		this.syncChunks(linker, true);
@@ -291,11 +290,11 @@ public class LinkerManager extends PluginWorldManager {
 	}
 
 	private @NotNull World createLinker(Player player, Player otherPlayer) {
-		return this.createLinker(player, otherPlayer, this.getUniqueId("__lnk"));
+		return this.createLinker(player, otherPlayer, super.getUniqueId("__lnk"));
 	}
 
 	private @NotNull World createLinker(@NotNull Player player, @NotNull Player otherPlayer, String linkerName) {
-		final @NotNull World linker = Objects.requireNonNull(this.getLinkerCreator(linkerName).createWorld());
+		final World linker = Objects.requireNonNull(this.getLinkerCreator(linkerName).createWorld());
 
 		final PersistentDataContainer playerContainer = player.getPersistentDataContainer();
 		final PersistentDataContainer otherPlayerContainer = otherPlayer.getPersistentDataContainer();
@@ -304,14 +303,12 @@ public class LinkerManager extends PluginWorldManager {
 		playerContainer.set(linkedPocketKey, PersistentDataType.STRING, linker.getName().split("/")[1]);
 		otherPlayerContainer.set(linkedPocketKey, PersistentDataType.STRING, linker.getName().split("/")[1]);
 
-		List<String> linkedPockets = linkerContainer.get(linkedPocketKey, DataType.STRING_LIST);
-		if (linkedPockets == null) linkedPockets = new LinkedList<>();
+		final List<String> linkedPockets = linkerContainer.getOrDefault(linkedPocketKey, DataType.STRING_LIST, new LinkedList<>());
 
 		String pocketName = playerContainer.get(pocketKey, PersistentDataType.STRING);
 		if (!linkedPockets.contains(pocketName)) linkedPockets.add(pocketName);
 		pocketName = otherPlayerContainer.get(pocketKey, PersistentDataType.STRING);
 		if (!linkedPockets.contains(pocketName)) linkedPockets.add(pocketName);
-
 		linkerContainer.set(linkedPocketKey, DataType.STRING_LIST, linkedPockets);
 
 		super.generateMisc(linker);
@@ -328,8 +325,7 @@ public class LinkerManager extends PluginWorldManager {
 
 		playerContainer.remove(linkedPocketKey);
 
-		List<String> linkedPockets = linkerContainer.get(linkedPocketKey, DataType.STRING_LIST);
-		if (linkedPockets == null) linkedPockets = new LinkedList<>();
+		final List<String> linkedPockets = linkerContainer.getOrDefault(linkedPocketKey, DataType.STRING_LIST, new LinkedList<>());
 
 		final String pocketName = playerContainer.get(pocketKey, PersistentDataType.STRING);
 		linkedPockets.remove(pocketName);
@@ -339,8 +335,7 @@ public class LinkerManager extends PluginWorldManager {
 	private void deleteLinker(@NotNull World linker, @NotNull OfflinePlayer player) {
 		final PersistentDataContainer linkerContainer = linker.getPersistentDataContainer();
 
-		List<String> linkedPockets = linkerContainer.get(linkedPocketKey, DataType.STRING_LIST);
-		if (linkedPockets == null) linkedPockets = new LinkedList<>();
+		final List<String> linkedPockets = linkerContainer.getOrDefault(linkedPocketKey, DataType.STRING_LIST, new LinkedList<>());
 
 		linkedPockets.remove(player.getName());
 		linkerContainer.set(linkedPocketKey, DataType.STRING_LIST, linkedPockets);
