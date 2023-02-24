@@ -56,11 +56,12 @@ public class LinkerManager extends PluginWorldManager {
 	 */
 	public boolean isLinked(@NotNull Player player) {
 		final World pocket = pocketInstance.getPocket(player);
-		final World linker = this.getLinker(player);
-		if (linker == null || pocket == null) return false;
 
 		final PersistentDataContainer playerContainer = player.getPersistentDataContainer();
 		final PersistentDataContainer pocketContainer = pocket.getPersistentDataContainer();
+		if (!playerContainer.has(linkedPocketKey)) return false;
+
+		final World linker = Objects.requireNonNull(this.getLinker(player));
 		final PersistentDataContainer linkerContainer = linker.getPersistentDataContainer();
 
 		final List<String> linkerPocketsName = linkerContainer.getOrDefault(linkedPocketKey, DataType.STRING_LIST, new LinkedList<>());
