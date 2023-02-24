@@ -130,6 +130,19 @@ public abstract class PluginWorldManager {
 		return this.teleportPlayer(player, spawnLocation);
 	}
 
+	/**
+	 * Returns spawn Location of Pocket or Linker
+	 *
+	 * @param player target Player object
+	 * @return spawn Location
+	 */
+	public Location getSpawnLocation(@NotNull Player player) {
+		if (linkerInstance.isLinked(player))
+			return linkerInstance.getLinker(player).getSpawnLocation();
+		else
+			return pocketInstance.getPocket(player).getSpawnLocation();
+	}
+
 	private boolean teleportPlayer(@NotNull Player player, Location spawnLocation) {
 		player.teleport(spawnLocation, TeleportCause.PLUGIN);
 

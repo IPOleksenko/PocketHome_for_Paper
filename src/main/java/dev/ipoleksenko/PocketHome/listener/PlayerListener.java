@@ -2,6 +2,7 @@ package dev.ipoleksenko.PocketHome.listener;
 
 import dev.ipoleksenko.PocketHome.PocketHomePlugin;
 import dev.ipoleksenko.PocketHome.manager.PocketManager;
+import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -9,6 +10,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.PlayerLeashEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerUnleashEntityEvent;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.jetbrains.annotations.NotNull;
@@ -58,5 +60,14 @@ public class PlayerListener implements Listener {
 		final PersistentDataContainer playerContainer = player.getPersistentDataContainer();
 		final PocketManager pocketManager = PocketHomePlugin.getInstance().getPocketManager();
 		pocketManager.clearLeashedEntity(playerContainer);
+	}
+
+	@EventHandler
+	public void onRespawn(@NotNull PlayerRespawnEvent event) {
+		final PocketManager pocketManager = PocketHomePlugin.getInstance().getPocketManager();
+		final Player player = event.getPlayer();
+		final Location spawnLocation = pocketManager.getSpawnLocation(player);
+
+		event.setRespawnLocation(spawnLocation);
 	}
 }
