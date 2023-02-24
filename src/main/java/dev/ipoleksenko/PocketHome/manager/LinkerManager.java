@@ -213,7 +213,7 @@ public class LinkerManager extends PluginWorldManager {
 		return level;
 	}
 
-	private void syncChunks(@NotNull World linker, boolean savePockets) {
+	private void syncChunks(@NotNull World linker, boolean toPocket) {
 		final PersistentDataContainer linkerContainer = linker.getPersistentDataContainer();
 		final List<String> linkerPocketNames = linkerContainer.getOrDefault(linkedPocketKey, DataType.STRING_LIST, new LinkedList<>());
 
@@ -226,30 +226,36 @@ public class LinkerManager extends PluginWorldManager {
 			for (int linkerChunkX = -max; linkerChunkX <= max; linkerChunkX += 4 * radius)
 				for (int linkerChunkZ = -max; linkerChunkZ <= max; linkerChunkZ += 4 * radius) {
 					if (Math.abs(linkerChunkX) != max && Math.abs(linkerChunkZ) != max) continue;
-
 					if (!pocketWorlds.hasNext()) {
-						if (savePockets) this.clearChunk(linker, linkerChunkX, linkerChunkZ, radius);
+						if (toPocket) this.clearChunk(linker, linkerChunkX, linkerChunkZ, radius);
 						break;
 					}
+
 					final World pocket = pocketWorlds.next();
 					for (int pocketChunkX = -radius; pocketChunkX < radius; ++pocketChunkX)
 						for (int pocketChunkZ = -radius; pocketChunkZ < radius; ++pocketChunkZ) {
 							final int toChunkX = linkerChunkX + pocketChunkX;
 							final int toChunkZ = linkerChunkZ + pocketChunkZ;
-							if (savePockets) {
-								final Chunk pocketChunk = pocket.getChunkAt(pocketChunkX, pocketChunkZ);
-								final ChunkSnapshot linkerChunkSnapshot = linker.getChunkAt(toChunkX, toChunkZ).getChunkSnapshot();
-								Bukkit.getScheduler().runTask(PocketHomePlugin.getInstance(), () -> this.copyChunk(linkerChunkSnapshot, pocketChunk));
-							} else {
-								final ChunkSnapshot pocketChunkSnapshot = pocket.getChunkAt(pocketChunkX, pocketChunkZ).getChunkSnapshot();
-								final Chunk linkerChunk = linker.getChunkAt(toChunkX, toChunkZ);
-								Bukkit.getScheduler().runTask(PocketHomePlugin.getInstance(), () -> this.copyChunk(pocketChunkSnapshot, linkerChunk));
-							}
+
+							final Chunk pocketChunk = pocket.getChunkAt(pocketChunkX, pocketChunkZ);
+							final Chunk linkerChunk = linker.getChunkAt(toChunkX, toChunkZ);
+							if (toPocket)
+								Bukkit.getScheduler().runTask(PocketHomePlugin.getInstance(), () -> this.copyChunk(linkerChunk.getChunkSnapshot(), pocketChunk));
+							else
+								Bukkit.getScheduler().runTask(PocketHomePlugin.getInstance(), () -> this.copyChunk(pocketChunk.getChunkSnapshot(), linkerChunk));
 						}
 				}
 		}
 	}
 
+	/**
+	 * Replace all blocks in chunks with Air
+	 *
+	 * @param linker       target Linker
+	 * @param linkerChunkX X corner of an area
+	 * @param linkerChunkZ Z corner of an area
+	 * @param radius       radius of area
+	 */
 	private void clearChunk(World linker, int linkerChunkX, int linkerChunkZ, int radius) {
 		for (int pocketChunkX = -radius; pocketChunkX < radius; ++pocketChunkX)
 			for (int pocketChunkZ = -radius; pocketChunkZ < radius; ++pocketChunkZ) {
@@ -263,6 +269,12 @@ public class LinkerManager extends PluginWorldManager {
 			}
 	}
 
+	/**
+	 * Copy all blocks from chunk to other chunk
+	 *
+	 * @param from target chunk
+	 * @param to   destination chunk
+	 */
 	private void copyChunk(ChunkSnapshot from, Chunk to) {
 		for (int x = 0; x < 16; ++x)
 			for (int y = -64; y < 320; ++y)
