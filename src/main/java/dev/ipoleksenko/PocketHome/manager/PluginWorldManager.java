@@ -10,8 +10,10 @@ import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.jetbrains.annotations.NotNull;
 
-import java.nio.ByteBuffer;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 public abstract class PluginWorldManager {
 
@@ -35,14 +37,7 @@ public abstract class PluginWorldManager {
 	}
 
 	protected String getUniqueId() {
-		final Base64.Encoder encoder = Base64.getUrlEncoder();
-		final ByteBuffer bb = ByteBuffer.wrap(new byte[8]);
-		final UUID uuid = UUID.randomUUID();
-
-		bb.putLong(uuid.getLeastSignificantBits());
-		final byte[] bytes = bb.array();
-
-		return encoder.encodeToString(bytes).replace("=", "").toLowerCase();
+		return UUID.randomUUID().toString().replace("-", "").substring(0, 8);
 	}
 
 	protected String getUniqueId(String prefix) {
