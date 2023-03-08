@@ -6,8 +6,11 @@ import dev.ipoleksenko.PocketHome.listener.EnderChestListener;
 import dev.ipoleksenko.PocketHome.listener.PlayerListener;
 import dev.ipoleksenko.PocketHome.manager.LinkerManager;
 import dev.ipoleksenko.PocketHome.manager.PocketManager;
+import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.UUID;
 
 public class PocketHomePlugin extends JavaPlugin {
 
@@ -37,6 +40,35 @@ public class PocketHomePlugin extends JavaPlugin {
 
 	public static Integer getPocketRadius() {
 		return POCKET_RADIUS;
+	}
+
+	/**
+	 * Generates unique ID
+	 *
+	 * @return alphanumeric id
+	 */
+	public static @NotNull String getUniqueId() {
+		return UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+	}
+
+	/**
+	 * Generates unique ID with prefix
+	 *
+	 * @param prefix id prefix
+	 * @return prefix + id
+	 */
+	public static @NotNull String getUniqueId(String prefix) {
+		return prefix + getUniqueId();
+	}
+
+	/**
+	 * Creates NamespacedKey for saving data in PersistentDataContainer
+	 *
+	 * @param key name of the key
+	 * @return pockethome:key
+	 */
+	public NamespacedKey getNamespacedKey(String key) {
+		return NamespacedKey.fromString(key, this);
 	}
 
 	/**

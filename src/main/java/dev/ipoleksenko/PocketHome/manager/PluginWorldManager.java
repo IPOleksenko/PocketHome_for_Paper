@@ -33,30 +33,13 @@ public abstract class PluginWorldManager {
 	);
 	protected static PocketManager pocketInstance;
 	protected static LinkerManager linkerInstance;
-	protected final @NotNull NamespacedKey pocketKey;
-	protected final @NotNull NamespacedKey pocketOwnerKey;
-	protected final @NotNull NamespacedKey pocketGuestsKey;
-	protected final @NotNull NamespacedKey teleportLocationKey;
-	protected final @NotNull NamespacedKey linkedPocketKey;
-	private final @NotNull NamespacedKey leashedEntitiesKey;
-
-
-	protected PluginWorldManager() {
-		this.pocketKey = Objects.requireNonNull(NamespacedKey.fromString("pocket", PocketHomePlugin.getInstance()));
-		this.pocketOwnerKey = Objects.requireNonNull(NamespacedKey.fromString("pocket_owner", PocketHomePlugin.getInstance()));
-		this.pocketGuestsKey = Objects.requireNonNull(NamespacedKey.fromString("pocket_guests", PocketHomePlugin.getInstance()));
-		this.teleportLocationKey = Objects.requireNonNull(NamespacedKey.fromString("teleport_location", PocketHomePlugin.getInstance()));
-		this.linkedPocketKey = Objects.requireNonNull(NamespacedKey.fromString("linked_pocket", PocketHomePlugin.getInstance()));
-		this.leashedEntitiesKey = Objects.requireNonNull(NamespacedKey.fromString("leashed_entities", PocketHomePlugin.getInstance()));
-	}
-
-	protected String getUniqueId() {
-		return UUID.randomUUID().toString().replace("-", "").substring(0, 8);
-	}
-
-	protected String getUniqueId(String prefix) {
-		return prefix + this.getUniqueId();
-	}
+	protected final NamespacedKey pocketKey = PocketHomePlugin.getInstance().getNamespacedKey("pocket");
+	protected final NamespacedKey pocketOwnerKey = PocketHomePlugin.getInstance().getNamespacedKey("pocket_owner");
+	protected final NamespacedKey pocketGuestsKey = PocketHomePlugin.getInstance().getNamespacedKey("pocket_guests");
+	protected final NamespacedKey teleportLocationKey = PocketHomePlugin.getInstance()
+					.getNamespacedKey("teleport_location");
+	protected final NamespacedKey linkedPocketKey = PocketHomePlugin.getInstance().getNamespacedKey("linked_pocket");
+	private final NamespacedKey leashedEntitiesKey = PocketHomePlugin.getInstance().getNamespacedKey("leashed_entities");
 
 	/**
 	 * Used for saving Pocket in separate folder
@@ -102,7 +85,8 @@ public abstract class PluginWorldManager {
 	 * @return true, if the teleport was successful
 	 */
 	public boolean teleportTo(@NotNull Player player, @NotNull Player otherPlayer) {
-		return linkerInstance.isLinked(otherPlayer) ? linkerInstance.teleportToLinker(player, otherPlayer) : pocketInstance.teleportToPocket(player, otherPlayer);
+		return linkerInstance.isLinked(otherPlayer) ? linkerInstance.teleportToLinker(player, otherPlayer)
+		                                            : pocketInstance.teleportToPocket(player, otherPlayer);
 	}
 
 	/**
@@ -132,10 +116,9 @@ public abstract class PluginWorldManager {
 	 */
 	public boolean teleportFrom(@NotNull Player player) {
 		final PersistentDataContainer playerContainer = player.getPersistentDataContainer();
-		Location spawnLocation = playerContainer.get(teleportLocationKey, DataType.LOCATION);
-
-		if (spawnLocation == null) spawnLocation = player.getBedSpawnLocation();
-		if (spawnLocation == null) spawnLocation = Bukkit.getWorlds().get(0).getSpawnLocation();
+		final Location defaultSpawn = player.getBedSpawnLocation() != null ? player.getBedSpawnLocation()
+		                                                                   : Bukkit.getWorlds().get(0).getSpawnLocation();
+		final Location spawnLocation = playerContainer.getOrDefault(teleportLocationKey, DataType.LOCATION, defaultSpawn);
 
 		player.setInvulnerable(false);
 		return this.teleportPlayer(player, spawnLocation);
@@ -146,11 +129,17 @@ public abstract class PluginWorldManager {
 		if (!result) return false;
 
 		final PersistentDataContainer playerContainer = player.getPersistentDataContainer();
-		this.getLeashedEntities(playerContainer, false).stream().map(Bukkit::getEntity).filter(Objects::nonNull).filter(LivingEntity.class::isInstance).map(LivingEntity.class::cast).forEach(livingEntity -> {
-			livingEntity.setLeashHolder(null);
-			livingEntity.teleport(spawnLocation, TeleportCause.PLUGIN);
-			livingEntity.setLeashHolder(player);
-		});
+		this.getLeashedEntities(playerContainer, false)
+						.stream()
+						.map(Bukkit::getEntity)
+						.filter(Objects::nonNull)
+						.filter(LivingEntity.class::isInstance)
+						.map(LivingEntity.class::cast)
+						.forEach(livingEntity -> {
+							livingEntity.setLeashHolder(null);
+							livingEntity.teleport(spawnLocation, TeleportCause.PLUGIN);
+							livingEntity.setLeashHolder(player);
+						});
 
 		return true;
 	}
