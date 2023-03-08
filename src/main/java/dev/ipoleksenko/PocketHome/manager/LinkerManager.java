@@ -132,8 +132,8 @@ public class LinkerManager extends PluginWorldManager {
 
 		final World linker = this.getLinker(player);
 
-		final List<OfflinePlayer> linkedPlayers = this.getLinkedPlayers(player).stream().filter(otherPlayer::equals).toList();
-		if (linkedPlayers.isEmpty()) return false;
+		final List<OfflinePlayer> linkedPlayers = this.getLinkedPlayers(player);
+		if (!linkedPlayers.contains(otherPlayer)) return false;
 
 		if (linker == player.getWorld()) this.teleportFrom(player);
 
