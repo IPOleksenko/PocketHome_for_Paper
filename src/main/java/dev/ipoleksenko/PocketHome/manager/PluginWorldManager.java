@@ -10,13 +10,27 @@ import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 public abstract class PluginWorldManager {
 
+	private static final Map<GameRule<Boolean>, Boolean> DEFAULT_GAMERULES = Map.ofEntries(
+					Map.entry(GameRule.DISABLE_RAIDS, true),
+					Map.entry(GameRule.DO_DAYLIGHT_CYCLE, false),
+					Map.entry(GameRule.DO_FIRE_TICK, false),
+					Map.entry(GameRule.DO_INSOMNIA, false),
+					Map.entry(GameRule.DO_MOB_SPAWNING, false),
+					Map.entry(GameRule.DO_PATROL_SPAWNING, false),
+					Map.entry(GameRule.DO_TRADER_SPAWNING, false),
+					Map.entry(GameRule.DO_WARDEN_SPAWNING, false),
+					Map.entry(GameRule.DO_WEATHER_CYCLE, false),
+					Map.entry(GameRule.DROWNING_DAMAGE, false),
+					Map.entry(GameRule.FALL_DAMAGE, false),
+					Map.entry(GameRule.FIRE_DAMAGE, false),
+					Map.entry(GameRule.FREEZE_DAMAGE, false),
+					Map.entry(GameRule.KEEP_INVENTORY, true),
+					Map.entry(GameRule.MOB_GRIEFING, false)
+	);
 	protected static PocketManager pocketInstance;
 	protected static LinkerManager linkerInstance;
 	protected final @NotNull NamespacedKey pocketKey;
@@ -169,21 +183,7 @@ public abstract class PluginWorldManager {
 	}
 
 	protected void generateMisc(@NotNull World world) {
-		world.setGameRule(GameRule.DISABLE_RAIDS, true);
-		world.setGameRule(GameRule.DO_DAYLIGHT_CYCLE, false);
-		world.setGameRule(GameRule.DO_FIRE_TICK, false);
-		world.setGameRule(GameRule.DO_INSOMNIA, false);
-		world.setGameRule(GameRule.DO_MOB_SPAWNING, false);
-		world.setGameRule(GameRule.DO_PATROL_SPAWNING, false);
-		world.setGameRule(GameRule.DO_TRADER_SPAWNING, false);
-		world.setGameRule(GameRule.DO_WARDEN_SPAWNING, false);
-		world.setGameRule(GameRule.DO_WEATHER_CYCLE, false);
-		world.setGameRule(GameRule.DROWNING_DAMAGE, false);
-		world.setGameRule(GameRule.FALL_DAMAGE, false);
-		world.setGameRule(GameRule.FIRE_DAMAGE, false);
-		world.setGameRule(GameRule.FREEZE_DAMAGE, false);
-		world.setGameRule(GameRule.KEEP_INVENTORY, true);
-		world.setGameRule(GameRule.MOB_GRIEFING, false);
+		DEFAULT_GAMERULES.forEach(world::setGameRule);
 
 		world.getBlockAt(0, 1, 0).setType(Material.ENDER_CHEST);
 		world.setSpawnLocation(1, 1, -1);
