@@ -114,8 +114,7 @@ public class LinkerManager extends PluginWorldManager {
 		                                           : this.isLinked(otherPlayer) ? this.getLinker(otherPlayer)
 		                                                                        : this.createLinker(player, otherPlayer);
 
-		if (this.isLinked(player) || this.isLinked(otherPlayer))
-			this.createLinker(player, otherPlayer, linker.getName().split("/")[1]);
+		if (this.isLinked(player) || this.isLinked(otherPlayer)) this.createLinker(player, otherPlayer, linker);
 
 		return true;
 	}
@@ -296,8 +295,11 @@ public class LinkerManager extends PluginWorldManager {
 	}
 
 	private @NotNull World createLinker(@NotNull Player player, @NotNull Player otherPlayer, String linkerName) {
-		final World linker = Objects.requireNonNull(this.getLinkerCreator(linkerName).createWorld());
+		final World linker = this.getLinkerCreator(linkerName).createWorld();
+		return this.createLinker(player, otherPlayer, linker);
+	}
 
+	private @NotNull World createLinker(@NotNull Player player, @NotNull Player otherPlayer, @NotNull World linker) {
 		final PersistentDataContainer playerContainer = player.getPersistentDataContainer();
 		final PersistentDataContainer otherPlayerContainer = otherPlayer.getPersistentDataContainer();
 		final PersistentDataContainer linkerContainer = linker.getPersistentDataContainer();
