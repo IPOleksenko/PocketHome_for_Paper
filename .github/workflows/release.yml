@@ -20,9 +20,9 @@ jobs:
       - name: Build artifacts
         run: ./gradlew build
       - name: Release Plugin
-        uses: "marvinpinto/action-automatic-releases@latest"
+        uses: marvinpinto/action-automatic-releases@latest
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
           prerelease: false
           files: |
             build/libs/*[0-9].jar
