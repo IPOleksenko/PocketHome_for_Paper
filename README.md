@@ -12,8 +12,8 @@ Also, players can invite guests in their pockets or link pockets in one super-po
 Get the source from GitHub and build it with Gradle:
 
 ```shell
-git clone https://github.com/IPOleksenko/PocketHome.git
-cd PocketHome/
+git clone https://github.com/IPOleksenko/PocketHome_for_Paper.git
+cd PocketHome_for_Paper/
 ./gradlew build
 ```
 
