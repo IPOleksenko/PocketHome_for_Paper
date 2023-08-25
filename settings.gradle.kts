@@ -5,4 +5,4 @@ pluginManagement {
 	}
 }
 
-rootProject.name = "PocketHome"
+rootProject.name = "PocketHome_for_Paper"
