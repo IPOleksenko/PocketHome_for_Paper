@@ -1,7 +1,6 @@
 package dev.ipoleksenko.PocketHome.listener;
 
 import dev.ipoleksenko.PocketHome.GUI.mainGUI;
-import dev.ipoleksenko.PocketHome.GUI.settingsGUI;
 import dev.ipoleksenko.PocketHome.PocketHomePlugin;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -14,7 +13,6 @@ import org.jetbrains.annotations.NotNull;
 
 public class ChestListener implements Listener {
 	mainGUI main = new mainGUI();
-	settingsGUI settings = new settingsGUI();
 
 	// Check for clicks on items
 	@EventHandler
@@ -40,28 +38,14 @@ public class ChestListener implements Listener {
 				player.sendMessage("Teleport from HOME...");
 				PocketHomePlugin.getInstance().getPocketManager().teleportFrom(player);
 			}
-		else if (event.getCurrentItem().getType() == Material.ACACIA_DOOR)
-			player.sendMessage("ACACIA_DOOR");
-		else if (event.getCurrentItem().getType() == Material.REDSTONE)
-			player.sendMessage("REDSTONE");
-		else if (event.getCurrentItem().getType() == Material.BOOK)
-			settings.OpenGUI(player);
-
-		if (event.getCurrentItem().getType() == Material.IRON_DOOR)
-			player.sendMessage("IRON_DOOR");
-		else if (event.getCurrentItem().getType() == Material.LEVER)
-			player.sendMessage("LEVER");
-		else if (event.getCurrentItem().getType() == Material.STICK)
-			main.OpenGUI(player);
+		else if (event.getCurrentItem().getType() == Material.CHEST)
+			player.closeInventory();
 	}
 
 	// Cancel dragging in our inventory
 	@EventHandler
 	public void onInventoryClick(final @NotNull InventoryDragEvent event) {
 		if (event.getInventory().equals(main.main)) {
-			event.setCancelled(true);
-		}
-		if (event.getInventory().equals(settings.settings)) {
 			event.setCancelled(true);
 		}
 	}

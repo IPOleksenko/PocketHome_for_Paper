@@ -10,12 +10,10 @@ public class mainGUI extends GUI {
 	public final Inventory main = Bukkit.createInventory(null, 9, "PocketHome");
 
 	public void initializeItems(Player player) {
-		main.setItem(1, createGuiItem(Material.RED_BED,
+		main.setItem(0, createGuiItem(Material.RED_BED,
 						"Teleport",
 						(!PocketHomePlugin.getInstance().getPocketManager().isInPocket(player) ? "Teleport on home" : "Teleport from home")));
-		main.setItem(3, createGuiItem(Material.ACACIA_DOOR, "Enter someone else's house", "Enter a house whose owner has allowed entry"));
-		main.setItem(5, createGuiItem(Material.REDSTONE, "Settings", "Your home settings"));
-		main.setItem(7, createGuiItem(Material.BOOK, "Help", "Help using PocketHome"));
+		main.setItem(8, createGuiItem(Material.CHEST, "Exit from chest", "You will close the chest"));
 	}
 
 	public void OpenGUI(final Player player) {
